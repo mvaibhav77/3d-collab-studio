@@ -1,7 +1,27 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import federation from "@originjs/vite-plugin-federation";
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-})
+  // Add this server block
+  server: {
+    cors: true,
+  },
+  plugins: [
+    react(),
+    federation({
+      name: "mfe_toolbar",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./Toolbar": "./src/Toolbar.tsx",
+      },
+      shared: ["react", "react-dom"],
+    }),
+  ],
+  build: {
+    modulePreload: false,
+    target: "esnext",
+    minify: false,
+    cssCodeSplit: false,
+  },
+});
