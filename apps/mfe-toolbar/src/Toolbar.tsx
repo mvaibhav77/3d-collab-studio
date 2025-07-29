@@ -1,16 +1,21 @@
 import React from "react";
 
-const Toolbar: React.FC = () => {
+const Toolbar = () => {
+  const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    // Attach the type of object we are dragging
+    event.dataTransfer.setData("text/plain", "cube");
+  };
+
   return (
-    <div style={{ border: "2px dashed red", padding: "1rem" }}>
-      <h2 style={{ color: "red" }}>I am the Toolbar MFE!</h2>
-      <p>
-        This entire component is being served from mfe-toolbar running on its
-        own port.
-      </p>
-      <button onClick={() => alert("Button clicked in toolbar MFE!")}>
-        A Button from Toolbar MFE
-      </button>
+    <div className="flex flex-col space-y-2">
+      <div
+        draggable="true"
+        onDragStart={handleDragStart}
+        className="p-4 bg-gray-200 border rounded cursor-grab text-center font-bold"
+      >
+        Cube 🧊
+      </div>
+      {/* We can add more draggable items here later */}
     </div>
   );
 };

@@ -1,94 +1,117 @@
-import { useRef, useState, useEffect } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useState, useEffect } from "react";
+import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { socket } from "./socket";
-import type { Mesh } from "@repo/three-wrapper";
+import { nanoid } from "nanoid";
+import type { SceneObject } from "./types";
+import Box from "./shapes/Box";
+import DragDropCanvas from "./components/CanvasWrapper";
 
-// The Box component is now simpler. It receives its color and click handler as props.
-function Box(props: {
-  position: [number, number, number];
-  color: string;
-  onClick: () => void;
-}) {
-  const meshRef = useRef<Mesh>(null!);
-  const [hovered, setHover] = useState(false);
-
-  useFrame(() => {
-    if (meshRef.current) {
-      meshRef.current.rotation.x += 0.005;
-      meshRef.current.rotation.y += 0.005;
-    }
-  });
-
-  return (
-    <mesh
-      {...props}
-      ref={meshRef}
-      scale={hovered ? 1.1 : 1}
-      onClick={props.onClick}
-      onPointerOver={() => setHover(true)}
-      onPointerOut={() => setHover(false)}
-    >
-      <boxGeometry args={[2, 2, 2]} />
-      <meshStandardMaterial color={props.color} />
-    </mesh>
-  );
-}
-
-// The Scene component now manages the state and socket events.
 export default function Scene() {
-  // State to hold all objects in the scene. For now, just our one box.
-  const [objects, setObjects] = useState<{ [id: string]: { color: string } }>({
-    "box-1": { color: "orange" },
+  // State to hold all objects in the scene
+  const [objects, setObjects] = useState<{ [id: string]: SceneObject }>({
+    "box-1": {
+      id: "box-1",
+      type: "cube",
+      position: [0, 0, 0],
+      color: "orange",
+    },
   });
 
-  // This effect runs once to set up the socket listener.
+  // Socket Listener Setup
   useEffect(() => {
-    // The handler function to update state when an event is received.
     const onColorChange = (data: { id: string; color: string }) => {
       setObjects((prevObjects) => ({
         ...prevObjects,
-        [data.id]: { color: data.color },
+        [data.id]: { ...prevObjects[data.id], color: data.color },
       }));
     };
 
-    // Listen for events from the server.
-    socket.on("object:color_change", onColorChange);
+    const onAddObject = (objectData: SceneObject) => {
+      setObjects((prevObjects) => ({
+        ...prevObjects,
+        [objectData.id]: objectData,
+      }));
+    };
 
-    // Clean up the listener when the component unmounts.
+    socket.on("object:color_change", onColorChange);
+    socket.on("scene:add_object", onAddObject);
+
     return () => {
       socket.off("object:color_change", onColorChange);
+      socket.off("scene:add_object", onAddObject);
     };
   }, []);
 
   // This function handles a local click on the box.
   const handleBoxClick = (id: string) => {
-    const newColor = objects[id].color === "orange" ? "hotpink" : "orange";
-    const updatedObject = { id, color: newColor };
+    const currentObject = objects[id];
+    const newColor = currentObject.color === "orange" ? "hotpink" : "orange";
 
-    // 1. Update the local state immediately for a responsive feel.
+    const updatedObject = {
+      ...currentObject,
+      color: newColor,
+    };
+
+    // Update the local state immediately for a responsive feel.
     setObjects((prevObjects) => ({
       ...prevObjects,
-      [id]: { color: newColor },
+      [id]: updatedObject,
     }));
 
-    // 2. Emit the change to the server to notify other clients.
-    socket.emit("object:color_change", updatedObject);
+    // Emit the change to the server to notify other clients.
+    socket.emit("object:color_change", { id, color: newColor });
+  };
+
+  // Handle drag and drop from external elements
+  const handleObjectDrop = (
+    objectType: string,
+    worldPosition: [number, number, number]
+  ) => {
+    if (objectType === "cube") {
+      const newObject: SceneObject = {
+        id: nanoid(),
+        type: "cube",
+        position: worldPosition,
+        color: "purple",
+      };
+
+      // Add to local state immediately
+      setObjects((prevObjects) => ({
+        ...prevObjects,
+        [newObject.id]: newObject,
+      }));
+
+      // Emit to server
+      socket.emit("scene:add_object", newObject);
+    }
   };
 
   return (
-    <Canvas>
-      <ambientLight intensity={Math.PI / 2} />
-      <directionalLight position={[10, 10, 5]} intensity={1} />
-      {Object.entries(objects).map(([id, props]) => (
-        <Box
-          key={id}
-          position={[0, 0, 0]}
-          color={props.color}
-          onClick={() => handleBoxClick(id)}
-        />
-      ))}
-      <OrbitControls />
-    </Canvas>
+    <DragDropCanvas onObjectDrop={handleObjectDrop}>
+      <Canvas>
+        <ambientLight intensity={Math.PI / 2} />
+        <directionalLight position={[10, 10, 5]} intensity={1} />
+
+        {/* This is our invisible ground plane to catch clicks */}
+        <mesh
+          rotation={[-Math.PI / 2, 0, 0]} // Rotate it to be flat
+          position={[0, -2, 0]} // Position it slightly below the center
+        >
+          <planeGeometry args={[100, 100]} />
+          <meshStandardMaterial color="white" visible={false} />
+        </mesh>
+
+        {Object.entries(objects).map(([id, obj]) => (
+          <Box
+            key={id}
+            position={obj.position}
+            color={obj.color}
+            onClick={() => handleBoxClick(id)}
+          />
+        ))}
+        <OrbitControls />
+      </Canvas>
+    </DragDropCanvas>
   );
 }

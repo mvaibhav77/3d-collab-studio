@@ -28,6 +28,13 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("object:color_change", data);
   });
 
+  // Listen for scene object addition events from the client
+  socket.on("scene:add_object", (data) => {
+    console.log(`Adding object:`, data);
+    // Use io.emit to send to all clients, including the sender
+    io.emit("scene:add_object", data);
+  });
+
   // Listen for a 'disconnect' event
   socket.on("disconnect", () => {
     console.log(`User disconnected: ${socket.id}`);
