@@ -1,7 +1,14 @@
 import { useGlobalStore } from "@repo/store";
+import { socket } from "../socket";
 
 const TransformPanel = () => {
-  const { transformMode, setTransformMode } = useGlobalStore();
+  const {
+    selectedObjectId,
+    objects,
+    updateObject,
+    transformMode,
+    setTransformMode,
+  } = useGlobalStore();
 
   const baseButtonClass = "w-full text-white font-bold py-2 px-4 rounded";
   const activeButtonClass = "bg-blue-700";
@@ -28,6 +35,22 @@ const TransformPanel = () => {
       >
         Scale
       </button>
+      {/* Color Selector */}
+      {selectedObjectId && (
+        <input
+          type="color"
+          value={objects[selectedObjectId]?.color || "#ffffff"}
+          onChange={(e) => {
+            const newColor = e.target.value;
+            updateObject(selectedObjectId, { color: newColor });
+            socket.emit("object:color_change", {
+              id: selectedObjectId,
+              color: newColor,
+            });
+          }}
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+      )}
     </div>
   );
 };
