@@ -14,7 +14,12 @@ export default defineConfig({
         mfe_toolbar: "http://localhost:5001/assets/remoteEntry.js",
         mfe_canvas: "http://localhost:5002/assets/remoteEntry.js",
       },
-      shared: ["react", "react-dom"],
+      shared: [
+        "react",
+        "react-dom",
+        "@react-three/fiber",
+        "@react-three/drei",
+      ],
     }),
   ],
 });

@@ -4,7 +4,9 @@ function App() {
   return (
     <div>
       <h1>This is the mfe-canvas application.</h1>
-      <Scene />
+      <div className="canvs-container h-screen w-screen">
+        <Scene />
+      </div>
     </div>
   );
 }

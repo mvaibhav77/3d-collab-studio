@@ -1,5 +1,3 @@
-// apps/mfe-canvas/vite.config.ts
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import federation from "@originjs/vite-plugin-federation";
@@ -18,7 +16,7 @@ export default defineConfig({
       exposes: {
         "./Scene": "./src/Scene.tsx",
       },
-      shared: ["react", "react-dom"],
+      shared: ["react", "react-dom", "@react-three/fiber", "@react-three/drei"],
     }),
   ],
   build: {
