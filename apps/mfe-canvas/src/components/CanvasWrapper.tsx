@@ -36,8 +36,14 @@ export default function DragDropCanvas({
       const ndcX = (x / rect.width) * 2 - 1;
       const ndcY = -(y / rect.height) * 2 + 1;
 
-      // Convert to 3D world coordinates - place on ground plane (y = 0)
-      const worldPosition: [number, number, number] = [ndcX * 10, 0, ndcY * 10];
+      // For 3D canvas, place objects at a reasonable distance from center
+      // This creates a more natural distribution around the origin
+      const scaleFactor = 8;
+      const worldPosition: [number, number, number] = [
+        ndcX * scaleFactor,
+        0, // Place on ground plane
+        ndcY * scaleFactor,
+      ];
 
       onObjectDrop(objectType, worldPosition);
     }
@@ -49,8 +55,9 @@ export default function DragDropCanvas({
       style={{
         width: "100%",
         height: "100%",
-        border: isDragOver ? "2px dashed #00ff00" : "none",
+        border: isDragOver ? "2px dashed #00ff00" : "1px solid #e0e0e0",
         transition: "border 0.2s ease-in-out",
+        backgroundColor: isDragOver ? "#f0fff0" : "#fafafa",
       }}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
