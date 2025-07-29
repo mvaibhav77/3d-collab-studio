@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
-import { TransformControls, OrbitControls } from "@react-three/drei";
+import { TransformControls } from "@react-three/drei";
 import { socket } from "./socket";
 import { nanoid } from "nanoid";
 import type { SceneObject, TransformChangeData } from "@repo/types";
 import Box from "./shapes/Box";
 import DragDropCanvas from "./components/CanvasWrapper";
+import FreeRoamControls from "./components/FreeRoamControls";
 import type { Mesh } from "@repo/three-wrapper";
 import { useGlobalStore } from "@repo/store";
 
@@ -145,12 +146,16 @@ export default function Scene() {
           />
         )}
 
-        <OrbitControls
-          enablePan={true}
-          enableZoom={true}
-          enableRotate={true}
+        <FreeRoamControls
           enabled={!isTransforming}
-          makeDefault
+          rotateSpeed={1.5}
+          zoomSpeed={2}
+          dampingFactor={0.1}
+          target={
+            selectedObjectId && objects[selectedObjectId]
+              ? objects[selectedObjectId].position
+              : [0, 0, 0]
+          }
         />
       </Canvas>
     </DragDropCanvas>
