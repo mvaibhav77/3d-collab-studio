@@ -9,7 +9,7 @@ const Toolbar: React.FC = () => {
         own port.
       </p>
       <button onClick={() => alert("Button clicked in toolbar MFE!")}>
-        A Button from the Toolbar
+        A Button from Toolbar MFE
       </button>
     </div>
   );
