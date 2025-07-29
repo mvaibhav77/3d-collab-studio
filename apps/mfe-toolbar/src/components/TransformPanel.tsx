@@ -1,7 +1,7 @@
-import { useUIStore } from "@repo/store";
+import { useGlobalStore } from "@repo/store";
 
 const TransformPanel = () => {
-  const { transformMode, setTransformMode } = useUIStore();
+  const { transformMode, setTransformMode } = useGlobalStore();
 
   const baseButtonClass = "w-full text-white font-bold py-2 px-4 rounded";
   const activeButtonClass = "bg-blue-700";

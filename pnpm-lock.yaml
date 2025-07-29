@@ -24,6 +24,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@repo/types':
+        specifier: workspace:^
+        version: link:../../packages/types
       express:
         specifier: ^5.1.0
         version: 5.1.0
@@ -64,6 +67,9 @@ importers:
       '@repo/three-wrapper':
         specifier: workspace:^
         version: link:../../packages/three-wrapper
+      '@repo/types':
+        specifier: workspace:^
+        version: link:../../packages/types
       '@tailwindcss/vite':
         specifier: ^4.1.11
         version: 4.1.11(vite@7.0.6)
@@ -137,6 +143,9 @@ importers:
       '@repo/three-wrapper':
         specifier: workspace:^
         version: link:../../packages/three-wrapper
+      '@repo/types':
+        specifier: workspace:^
+        version: link:../../packages/types
       '@tailwindcss/vite':
         specifier: ^4.1.11
         version: 4.1.11(vite@7.0.6)
@@ -201,6 +210,9 @@ importers:
       '@repo/store':
         specifier: workspace:^
         version: link:../../packages/store
+      '@repo/types':
+        specifier: workspace:^
+        version: link:../../packages/types
       '@tailwindcss/vite':
         specifier: ^4.1.11
         version: 4.1.11(vite@7.0.6)
@@ -298,9 +310,15 @@ importers:
 
   packages/store:
     dependencies:
+      '@repo/types':
+        specifier: workspace:^
+        version: link:../types
+      immer:
+        specifier: ^10.1.1
+        version: 10.1.1
       zustand:
         specifier: ^4.5.2
-        version: 4.5.7(@types/react@19.1.8)(react@19.1.0)
+        version: 4.5.7(immer@10.1.1)(react@19.1.0)
 
   packages/tailwind-config:
     devDependencies:
@@ -320,6 +338,8 @@ importers:
       '@types/three':
         specifier: ^0.178.1
         version: 0.178.1
+
+  packages/types: {}
 
   packages/typescript-config: {}
 
@@ -3330,6 +3350,10 @@ packages:
     resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==}
     dev: false
 
+  /immer@10.1.1:
+    resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
+    dev: false
+
   /import-fresh@3.3.1:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
     engines: {node: '>=6'}
@@ -5407,6 +5431,26 @@ packages:
         optional: true
     dependencies:
       '@types/react': 19.1.8
+      react: 19.1.0
+      use-sync-external-store: 1.5.0(react@19.1.0)
+    dev: false
+
+  /zustand@4.5.7(immer@10.1.1)(react@19.1.0):
+    resolution: {integrity: sha512-CHOUy7mu3lbD6o6LJLfllpjkzhHXSBlX8B9+qPddUsIfeF5S/UZ5q0kmCsnRqT1UHFQZchNFDDzMbQsuesHWlw==}
+    engines: {node: '>=12.7.0'}
+    peerDependencies:
+      '@types/react': '>=16.8'
+      immer: '>=9.0.6'
+      react: '>=16.8'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+    dependencies:
+      immer: 10.1.1
       react: 19.1.0
       use-sync-external-store: 1.5.0(react@19.1.0)
     dev: false

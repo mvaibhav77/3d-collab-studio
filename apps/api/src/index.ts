@@ -7,7 +7,7 @@ import type {
   ColorChangeData,
   PositionChangeData,
   SceneObject,
-} from "./types";
+} from "@repo/types";
 
 const PORT = process.env.PORT || 3001;
 

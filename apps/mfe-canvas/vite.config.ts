@@ -20,6 +20,7 @@ export default defineConfig({
         "react",
         "react-dom",
         "@repo/three-wrapper",
+        "@repo/types",
         "@react-three/fiber",
         "@react-three/drei",
         "@repo/store",

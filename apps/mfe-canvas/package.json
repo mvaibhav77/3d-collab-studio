@@ -15,6 +15,7 @@
     "@react-three/fiber": "^9.3.0",
     "@repo/store": "workspace:^",
     "@repo/three-wrapper": "workspace:^",
+    "@repo/types": "workspace:^",
     "@tailwindcss/vite": "^4.1.11",
     "nanoid": "^5.1.5",
     "react": "^19.1.0",

@@ -3,60 +3,52 @@ import { Canvas } from "@react-three/fiber";
 import { TransformControls, OrbitControls } from "@react-three/drei";
 import { socket } from "./socket";
 import { nanoid } from "nanoid";
-import type { SceneObject } from "./types";
+import type { SceneObject } from "@repo/types";
 import Box from "./shapes/Box";
 import DragDropCanvas from "./components/CanvasWrapper";
 import type { Mesh } from "@repo/three-wrapper";
-import { useUIStore } from "@repo/store";
+import { useGlobalStore } from "@repo/store";
 
 export default function Scene() {
   // State to hold all objects in the scene
   const objectRefs = useRef<{ [id: string]: Mesh }>({});
-  const [objects, setObjects] = useState<{ [id: string]: SceneObject }>({});
-  const { selectedObjectId, setSelectedObjectId } = useUIStore();
+  const {
+    objects,
+    addObject,
+    updateObject,
+    selectedObjectId,
+    setSelectedObjectId,
+  } = useGlobalStore();
   const [isTransforming, setIsTransforming] = useState(false);
 
   // Socket Listener Setup
   useEffect(() => {
     const onColorChange = (data: { id: string; color: string }) => {
-      setObjects((prevObjects) => ({
-        ...prevObjects,
-        [data.id]: { ...prevObjects[data.id], color: data.color },
-      }));
+      updateObject(data.id, { color: data.color });
     };
 
     const onPositionChange = (data: {
       id: string;
       position: [number, number, number];
     }) => {
-      setObjects((prevObjects) => {
-        // Only update if this object isn't currently being transformed by us
-        const currentSelected = selectedObjectId;
-        if (currentSelected !== data.id) {
-          // Also update the mesh position directly for smoother real-time updates
-          const mesh = objectRefs.current[data.id];
-          if (mesh) {
-            mesh.position.set(
-              data.position[0],
-              data.position[1],
-              data.position[2]
-            );
-          }
-
-          return {
-            ...prevObjects,
-            [data.id]: { ...prevObjects[data.id], position: data.position },
-          };
+      // Only update if this object isn't currently being transformed by us
+      if (selectedObjectId !== data.id) {
+        // Also update the mesh position directly for smoother real-time updates
+        const mesh = objectRefs.current[data.id];
+        if (mesh) {
+          mesh.position.set(
+            data.position[0],
+            data.position[1],
+            data.position[2]
+          );
         }
-        return prevObjects;
-      });
+
+        updateObject(data.id, { position: data.position });
+      }
     };
 
     const onAddObject = (objectData: SceneObject) => {
-      setObjects((prevObjects) => ({
-        ...prevObjects,
-        [objectData.id]: objectData,
-      }));
+      addObject(objectData);
     };
 
     socket.on("object:color_change", onColorChange);
@@ -68,7 +60,7 @@ export default function Scene() {
       socket.off("object:position_change", onPositionChange);
       socket.off("scene:add_object", onAddObject);
     };
-  }, [selectedObjectId]);
+  }, [selectedObjectId, addObject, updateObject]);
 
   // Handle drag and drop from external elements
   const handleObjectDrop = (
@@ -84,10 +76,7 @@ export default function Scene() {
       };
 
       // Add to local state immediately
-      setObjects((prevObjects) => ({
-        ...prevObjects,
-        [newObject.id]: newObject,
-      }));
+      addObject(newObject);
 
       // Emit to server
       socket.emit("scene:add_object", newObject);
@@ -148,13 +137,7 @@ export default function Scene() {
                   mesh.position.z,
                 ];
 
-                setObjects((prevObjects) => ({
-                  ...prevObjects,
-                  [selectedObjectId]: {
-                    ...prevObjects[selectedObjectId],
-                    position: newPosition,
-                  },
-                }));
+                updateObject(selectedObjectId, { position: newPosition });
 
                 // Emit to server for real-time collaboration
                 socket.emit("object:position_change", {
