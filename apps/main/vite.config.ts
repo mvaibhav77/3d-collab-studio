@@ -17,6 +17,7 @@ export default defineConfig({
       shared: [
         "react",
         "react-dom",
+        "@repo/three-wrapper",
         "@react-three/fiber",
         "@react-three/drei",
       ],

@@ -1,11 +1,11 @@
 import { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import * as THREE from "three";
+import type { Mesh } from "@repo/three-wrapper";
 
 function Box() {
   // ... (Box component code remains the same)
-  const meshRef = useRef<THREE.Mesh>(null!);
+  const meshRef = useRef<Mesh>(null!);
   useFrame((state, delta) => {
     meshRef.current.rotation.x += delta;
     meshRef.current.rotation.y += delta;

@@ -16,7 +16,13 @@ export default defineConfig({
       exposes: {
         "./Scene": "./src/Scene.tsx",
       },
-      shared: ["react", "react-dom", "@react-three/fiber", "@react-three/drei"],
+      shared: [
+        "react",
+        "react-dom",
+        "@repo/three-wrapper",
+        "@react-three/fiber",
+        "@react-three/drei",
+      ],
     }),
   ],
   build: {
