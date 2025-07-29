@@ -1,7 +1,30 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+// apps/mfe-canvas/vite.config.ts
 
-// https://vite.dev/config/
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import federation from "@originjs/vite-plugin-federation";
+import tailwindcss from "@tailwindcss/vite";
+
 export default defineConfig({
-  plugins: [react()],
-})
+  server: {
+    cors: true, // Enable CORS for the dev server
+  },
+  plugins: [
+    react(),
+    tailwindcss(),
+    federation({
+      name: "mfe_canvas",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./Scene": "./src/Scene.tsx",
+      },
+      shared: ["react", "react-dom"],
+    }),
+  ],
+  build: {
+    modulePreload: false,
+    target: "esnext",
+    minify: false,
+    cssCodeSplit: false,
+  },
+});

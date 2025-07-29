@@ -5,16 +5,16 @@ const RemoteToolbar = React.lazy(() => import("mfe_toolbar/Toolbar"));
 
 function App() {
   return (
-    <div className="App" style={{ padding: "2rem" }}>
+    <div className="App p-8">
       <header>
-        <h1 style={{ fontSize: "2rem", fontWeight: "bold" }}>
+        <h1 className="text-3xl font-bold text-center">
           Main Vite Host Application
         </h1>
-        <p style={{ marginTop: "1rem" }}>
+        <p className="mt-4">
           The component below is loaded from a separate micro-frontend.
         </p>
       </header>
-      <main style={{ marginTop: "2rem" }}>
+      <main className="mt-8">
         <ErrorBoundary>
           <React.Suspense fallback={<div>Loading Toolbar...</div>}>
             <RemoteToolbar />

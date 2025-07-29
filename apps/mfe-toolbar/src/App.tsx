@@ -1,4 +1,3 @@
-import "./App.css";
 import Toolbar from "./Toolbar";
 
 function App() {
