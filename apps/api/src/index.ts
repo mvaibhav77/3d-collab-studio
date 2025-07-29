@@ -5,8 +5,8 @@ import type {
   ServerToClientEvents,
   ClientToServerEvents,
   ColorChangeData,
-  PositionChangeData,
   SceneObject,
+  TransformChangeData,
 } from "@repo/types";
 
 const PORT = process.env.PORT || 3001;
@@ -39,7 +39,7 @@ io.on("connection", (socket) => {
   });
 
   // Listen for position change events from the client
-  socket.on("object:position_change", (data: PositionChangeData) => {
+  socket.on("object:transform_change", (data: TransformChangeData) => {
     // Clear any existing timer for this object
     const existingTimer = positionUpdateTimers.get(data.id);
     if (existingTimer) {
@@ -49,7 +49,7 @@ io.on("connection", (socket) => {
     // Throttle position updates to avoid spamming (30ms delay)
     const timer = setTimeout(() => {
       console.log(`Broadcasting position change:`, data);
-      socket.broadcast.emit("object:position_change", data);
+      socket.broadcast.emit("object:transform_change", data);
       positionUpdateTimers.delete(data.id);
     }, 30);
 

@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { TransformControls, OrbitControls } from "@react-three/drei";
 import { socket } from "./socket";
 import { nanoid } from "nanoid";
-import type { SceneObject } from "@repo/types";
+import type { SceneObject, TransformChangeData } from "@repo/types";
 import Box from "./shapes/Box";
 import DragDropCanvas from "./components/CanvasWrapper";
 import type { Mesh } from "@repo/three-wrapper";
@@ -18,6 +18,7 @@ export default function Scene() {
     updateObject,
     selectedObjectId,
     setSelectedObjectId,
+    transformMode,
   } = useGlobalStore();
   const [isTransforming, setIsTransforming] = useState(false);
 
@@ -27,23 +28,19 @@ export default function Scene() {
       updateObject(data.id, { color: data.color });
     };
 
-    const onPositionChange = (data: {
-      id: string;
-      position: [number, number, number];
-    }) => {
-      // Only update if this object isn't currently being transformed by us
+    const onTransformChange = (data: TransformChangeData) => {
       if (selectedObjectId !== data.id) {
-        // Also update the mesh position directly for smoother real-time updates
         const mesh = objectRefs.current[data.id];
         if (mesh) {
-          mesh.position.set(
-            data.position[0],
-            data.position[1],
-            data.position[2]
-          );
+          mesh.position.set(...data.position);
+          mesh.rotation.set(...data.rotation);
+          mesh.scale.set(...data.scale);
         }
-
-        updateObject(data.id, { position: data.position });
+        updateObject(data.id, {
+          position: data.position,
+          rotation: data.rotation,
+          scale: data.scale,
+        });
       }
     };
 
@@ -52,12 +49,12 @@ export default function Scene() {
     };
 
     socket.on("object:color_change", onColorChange);
-    socket.on("object:position_change", onPositionChange);
+    socket.on("object:transform_change", onTransformChange);
     socket.on("scene:add_object", onAddObject);
 
     return () => {
       socket.off("object:color_change", onColorChange);
-      socket.off("object:position_change", onPositionChange);
+      socket.off("object:transform_change", onTransformChange);
       socket.off("scene:add_object", onAddObject);
     };
   }, [selectedObjectId, addObject, updateObject]);
@@ -72,6 +69,8 @@ export default function Scene() {
         id: nanoid(),
         type: "cube",
         position: worldPosition,
+        rotation: [1, 1, 1],
+        scale: [1, 1, 1],
         color: "purple",
       };
 
@@ -124,26 +123,23 @@ export default function Scene() {
         {selectedObjectId && objectRefs.current[selectedObjectId] && (
           <TransformControls
             object={objectRefs.current[selectedObjectId]}
-            mode="translate"
-            onMouseDown={() => setIsTransforming(true)}
+            mode={transformMode} // Use mode from the store
             onMouseUp={() => setIsTransforming(false)}
+            onMouseDown={() => setIsTransforming(true)}
             onObjectChange={() => {
-              // Update local state when object is transformed
-              const mesh = objectRefs.current[selectedObjectId];
-              if (mesh && selectedObjectId) {
-                const newPosition: [number, number, number] = [
-                  mesh.position.x,
-                  mesh.position.y,
-                  mesh.position.z,
-                ];
+              const mesh = objectRefs.current[selectedObjectId!];
+              if (mesh) {
+                const transformData: TransformChangeData = {
+                  id: selectedObjectId!,
+                  position: mesh.position.toArray() as [number, number, number],
+                  rotation: [mesh.rotation.x, mesh.rotation.y, mesh.rotation.z],
+                  scale: mesh.scale.toArray() as [number, number, number],
+                };
 
-                updateObject(selectedObjectId, { position: newPosition });
-
-                // Emit to server for real-time collaboration
-                socket.emit("object:position_change", {
-                  id: selectedObjectId,
-                  position: newPosition,
-                });
+                // Update local state first
+                updateObject(transformData.id, transformData);
+                // Emit the new generic event to the server
+                socket.emit("object:transform_change", transformData);
               }
             }}
           />

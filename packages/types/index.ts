@@ -3,10 +3,19 @@
 // Core Scene Types
 export interface SceneObject {
   id: string;
-  type: string; // e.g., "cube", "sphere"
+  type: string;
   position: [number, number, number];
-  color: string; // e.g., "orange", "purple"
-  // We can add rotation and scale here later
+  color: string;
+  rotation: [number, number, number];
+  scale: [number, number, number];
+}
+
+// Transform Change Data
+export interface TransformChangeData {
+  id: string;
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: [number, number, number];
 }
 
 // UI and Transform Types
@@ -18,20 +27,15 @@ export interface ColorChangeData {
   color: string;
 }
 
-export interface PositionChangeData {
-  id: string;
-  position: [number, number, number];
-}
-
 // Socket Event Interface Types
 export interface ServerToClientEvents {
   "object:color_change": (data: ColorChangeData) => void;
-  "object:position_change": (data: PositionChangeData) => void;
+  "object:transform_change": (data: TransformChangeData) => void;
   "scene:add_object": (data: SceneObject) => void;
 }
 
 export interface ClientToServerEvents {
   "object:color_change": (data: ColorChangeData) => void;
-  "object:position_change": (data: PositionChangeData) => void;
+  "object:transform_change": (data: TransformChangeData) => void;
   "scene:add_object": (data: SceneObject) => void;
 }
