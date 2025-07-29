@@ -22,6 +22,7 @@ export default defineConfig({
         "@repo/three-wrapper",
         "@react-three/fiber",
         "@react-three/drei",
+        "@repo/store",
       ],
     }),
   ],

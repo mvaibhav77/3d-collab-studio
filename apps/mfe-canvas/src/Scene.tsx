@@ -7,12 +7,13 @@ import type { SceneObject } from "./types";
 import Box from "./shapes/Box";
 import DragDropCanvas from "./components/CanvasWrapper";
 import type { Mesh } from "@repo/three-wrapper";
+import { useUIStore } from "@repo/store";
 
 export default function Scene() {
   // State to hold all objects in the scene
   const objectRefs = useRef<{ [id: string]: Mesh }>({});
   const [objects, setObjects] = useState<{ [id: string]: SceneObject }>({});
-  const [selected, setSelected] = useState<string | null>(null);
+  const { selectedObjectId, setSelectedObjectId } = useUIStore();
   const [isTransforming, setIsTransforming] = useState(false);
 
   // Socket Listener Setup
@@ -30,7 +31,7 @@ export default function Scene() {
     }) => {
       setObjects((prevObjects) => {
         // Only update if this object isn't currently being transformed by us
-        const currentSelected = selected;
+        const currentSelected = selectedObjectId;
         if (currentSelected !== data.id) {
           // Also update the mesh position directly for smoother real-time updates
           const mesh = objectRefs.current[data.id];
@@ -67,7 +68,7 @@ export default function Scene() {
       socket.off("object:position_change", onPositionChange);
       socket.off("scene:add_object", onAddObject);
     };
-  }, [selected]);
+  }, [selectedObjectId]);
 
   // Handle drag and drop from external elements
   const handleObjectDrop = (
@@ -95,7 +96,10 @@ export default function Scene() {
 
   return (
     <DragDropCanvas onObjectDrop={handleObjectDrop}>
-      <Canvas camera={{ position: [10, 10, 10], fov: 50 }}>
+      <Canvas
+        camera={{ position: [10, 10, 10], fov: 50 }}
+        onPointerMissed={() => setSelectedObjectId(null)}
+      >
         <ambientLight intensity={Math.PI / 2} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
 
@@ -120,24 +124,24 @@ export default function Scene() {
             }}
             position={obj.position}
             color={obj.color}
-            isSelected={selected === id}
+            isSelected={selectedObjectId === id}
             onSelect={() => {
               console.log("Selected object:", obj);
-              setSelected(selected === id ? null : obj.id); // Toggle selection
+              setSelectedObjectId(selectedObjectId === id ? null : obj.id); // Toggle selection
             }}
           />
         ))}
 
-        {selected && objectRefs.current[selected] && (
+        {selectedObjectId && objectRefs.current[selectedObjectId] && (
           <TransformControls
-            object={objectRefs.current[selected]}
+            object={objectRefs.current[selectedObjectId]}
             mode="translate"
             onMouseDown={() => setIsTransforming(true)}
             onMouseUp={() => setIsTransforming(false)}
             onObjectChange={() => {
               // Update local state when object is transformed
-              const mesh = objectRefs.current[selected];
-              if (mesh && selected) {
+              const mesh = objectRefs.current[selectedObjectId];
+              if (mesh && selectedObjectId) {
                 const newPosition: [number, number, number] = [
                   mesh.position.x,
                   mesh.position.y,
@@ -146,15 +150,15 @@ export default function Scene() {
 
                 setObjects((prevObjects) => ({
                   ...prevObjects,
-                  [selected]: {
-                    ...prevObjects[selected],
+                  [selectedObjectId]: {
+                    ...prevObjects[selectedObjectId],
                     position: newPosition,
                   },
                 }));
 
                 // Emit to server for real-time collaboration
                 socket.emit("object:position_change", {
-                  id: selected,
+                  id: selectedObjectId,
                   position: newPosition,
                 });
               }

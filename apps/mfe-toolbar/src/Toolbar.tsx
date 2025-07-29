@@ -1,21 +1,15 @@
-import React from "react";
+import { useUIStore } from "@repo/store";
+import ObjectPanel from "./components/ObjectPanel";
+import TransformPanel from "./components/TransformPanel";
 
 const Toolbar = () => {
-  const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
-    // Attach the type of object we are dragging
-    event.dataTransfer.setData("text/plain", "cube");
-  };
+  // Get the selected object ID from the global store
+  const { selectedObjectId } = useUIStore();
 
   return (
-    <div className="flex flex-col space-y-2">
-      <div
-        draggable="true"
-        onDragStart={handleDragStart}
-        className="p-4 bg-gray-200 border rounded cursor-grab text-center font-bold"
-      >
-        Cube 🧊
-      </div>
-      {/* We can add more draggable items here later */}
+    <div className="p-2 bg-gray-100 rounded-lg">
+      {/* Conditionally render based on whether an object is selected */}
+      {selectedObjectId ? <TransformPanel /> : <ObjectPanel />}
     </div>
   );
 };

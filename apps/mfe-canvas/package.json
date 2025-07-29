@@ -13,6 +13,7 @@
     "@originjs/vite-plugin-federation": "^1.4.1",
     "@react-three/drei": "^10.6.1",
     "@react-three/fiber": "^9.3.0",
+    "@repo/store": "workspace:^",
     "@repo/three-wrapper": "workspace:^",
     "@tailwindcss/vite": "^4.1.11",
     "nanoid": "^5.1.5",
