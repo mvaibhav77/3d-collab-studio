@@ -1,18 +1,25 @@
 import { forwardRef } from "react";
 import type { Mesh } from "@repo/three-wrapper";
 
-// The Box component is now simpler. It receives its color and click handler as props.
 const Box = forwardRef<
   Mesh,
   {
     position: [number, number, number];
     color: string;
+    rotation: [number, number, number];
+    scale: [number, number, number];
     onSelect: () => void;
     isSelected?: boolean;
   }
 >((props, ref) => {
   return (
-    <mesh {...props} ref={ref} onClick={props.onSelect}>
+    <mesh
+      ref={ref}
+      position={props.position}
+      rotation={props.rotation}
+      scale={props.scale}
+      onClick={props.onSelect}
+    >
       <boxGeometry args={[2, 2, 2]} />
       <meshStandardMaterial color={props.color} wireframe={props.isSelected} />
     </mesh>

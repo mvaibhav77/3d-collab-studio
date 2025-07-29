@@ -112,6 +112,8 @@ export default function Scene() {
               }
             }}
             position={obj.position}
+            scale={obj.scale}
+            rotation={obj.rotation}
             color={obj.color}
             isSelected={selectedObjectId === id}
             onSelect={() => {
