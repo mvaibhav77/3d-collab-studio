@@ -7,7 +7,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   server: {
-    cors: true, // Enable CORS for the dev server
+    cors: true,
   },
   plugins: [
     react(),

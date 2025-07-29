@@ -4,8 +4,7 @@
   "type": "module",
   "private": true,
   "exports": {
-    ".": "./shared-styles.css",
-    "./postcss": "./postcss.config.js"
+    ".": "./shared-styles.css"
   },
   "devDependencies": {
     "postcss": "^8.5.3",

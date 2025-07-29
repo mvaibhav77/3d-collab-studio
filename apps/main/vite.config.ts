@@ -12,6 +12,7 @@ export default defineConfig({
       name: "main_host",
       remotes: {
         mfe_toolbar: "http://localhost:5001/assets/remoteEntry.js",
+        mfe_canvas: "http://localhost:5002/assets/remoteEntry.js",
       },
       shared: ["react", "react-dom"],
     }),

@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "dev": "vite preview --port 5002 --strictPort",
+    "tsc-build": "tsc && vite build",
+    "build": "vite build --watch --emptyOutDir",
+    "preview": "vite preview --port 5002 --strictPort"
   },
   "dependencies": {
     "@originjs/vite-plugin-federation": "^1.4.1",
