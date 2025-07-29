@@ -10,13 +10,16 @@ const TransformPanel = () => {
     setTransformMode,
   } = useGlobalStore();
 
-  const baseButtonClass = "w-full text-white font-bold py-2 px-4 rounded";
-  const activeButtonClass = "bg-blue-700";
-  const inactiveButtonClass = "bg-blue-500 hover:bg-blue-600";
+  const baseButtonClass =
+    "w-full text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200";
+  const activeButtonClass = "bg-primary-600 shadow-md";
+  const inactiveButtonClass = "bg-primary-500 hover:bg-primary-600";
 
   return (
-    <div className="flex flex-col space-y-2">
-      <h3 className="font-bold text-center mb-2">Transform</h3>
+    <div className="flex flex-col space-y-3">
+      <h3 className="text-slate-700 font-semibold text-sm uppercase tracking-wide border-b border-slate-300 pb-2">
+        Transform
+      </h3>
       <button
         onClick={() => setTransformMode("translate")}
         className={`${baseButtonClass} ${transformMode === "translate" ? activeButtonClass : inactiveButtonClass}`}
@@ -48,7 +51,7 @@ const TransformPanel = () => {
               color: newColor,
             });
           }}
-          className="w-full p-2 border border-gray-300 rounded"
+          className="w-full p-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         />
       )}
     </div>

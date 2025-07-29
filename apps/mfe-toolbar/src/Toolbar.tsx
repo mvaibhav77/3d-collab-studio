@@ -7,7 +7,7 @@ const Toolbar = () => {
   const { selectedObjectId } = useGlobalStore();
 
   return (
-    <div className="p-2 bg-gray-100 rounded-lg">
+    <div className="flex-1 grow p-4 bg-slate-100 border-r border-slate-300 shadow-lg h-100">
       {/* Conditionally render based on whether an object is selected */}
       {selectedObjectId ? <TransformPanel /> : <ObjectPanel />}
     </div>
