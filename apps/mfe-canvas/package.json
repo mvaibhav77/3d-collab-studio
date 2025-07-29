@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite preview --port 5002 --strictPort",
     "tsc-build": "tsc && vite build",
-    "build": "vite build --watch --emptyOutDir",
+    "build": "vite build --watch",
     "preview": "vite preview --port 5002 --strictPort"
   },
   "dependencies": {

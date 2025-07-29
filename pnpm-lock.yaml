@@ -273,9 +273,6 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
-      '@repo/ui':
-        specifier: workspace:^
-        version: 'link:'
       '@types/node':
         specifier: ^22.15.3
         version: 22.16.5
