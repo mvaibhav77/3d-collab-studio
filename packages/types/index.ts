@@ -32,10 +32,12 @@ export interface ServerToClientEvents {
   "object:color_change": (data: ColorChangeData) => void;
   "object:transform_change": (data: TransformChangeData) => void;
   "scene:add_object": (data: SceneObject) => void;
+  "object:remove": (data: { id: string }) => void;
 }
 
 export interface ClientToServerEvents {
   "object:color_change": (data: ColorChangeData) => void;
   "object:transform_change": (data: TransformChangeData) => void;
   "scene:add_object": (data: SceneObject) => void;
+  "object:remove": (data: { id: string }) => void;
 }

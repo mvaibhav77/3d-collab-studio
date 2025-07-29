@@ -30,6 +30,7 @@ export class SocketHandlers {
       "object:transform_change",
       this.handleTransformChange.bind(this)
     );
+    this.socket.on("object:remove", this.handleRemoveObject.bind(this));
     this.socket.on("disconnect", this.handleDisconnect.bind(this));
   }
 
@@ -95,6 +96,22 @@ export class SocketHandlers {
     }, config.socket.throttle.transformUpdateDelay);
 
     this.updateTimers.set(data.id, timer);
+  }
+
+  /**
+   * Handle object removal
+   */
+  private handleRemoveObject(data: { id: string }): void {
+    logger.info(`Removing object`, { id: data.id });
+
+    // Validate object ID
+    if (!data.id) {
+      logger.warn(`Invalid object ID received for removal`, { id: data.id });
+      return;
+    }
+
+    // Broadcast to all clients (including sender) to remove the object
+    this.io.emit("object:remove", { id: data.id });
   }
 
   /**

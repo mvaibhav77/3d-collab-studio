@@ -13,6 +13,7 @@ interface GlobalState {
   setObjects: (objects: { [id: string]: SceneObject }) => void;
   addObject: (object: SceneObject) => void; // To add one
   updateObject: (id: string, partialObject: Partial<SceneObject>) => void;
+  removeObject: (id: string) => void; // To remove one
 }
 
 // Create the store
@@ -39,6 +40,16 @@ export const useGlobalStore = create<GlobalState>()(
           produce((state) => {
             if (state.objects[id]) {
               Object.assign(state.objects[id], partialObject);
+            }
+          })
+        ),
+      removeObject: (id) =>
+        set(
+          produce((state) => {
+            delete state.objects[id];
+            // If the deleted object was the selected one, de-select it
+            if (state.selectedObjectId === id) {
+              state.selectedObjectId = null;
             }
           })
         ),
