@@ -1,9 +1,12 @@
 // TYPES FOR ALL COMMON OBJECTS IN MONOREPO APP
 
+// Supported shape types
+export type ShapeType = "box" | "sphere" | "cylinder" | "cone" | "torus";
+
 // Core Scene Types
 export interface SceneObject {
   id: string;
-  type: string;
+  type: ShapeType;
   position: [number, number, number];
   color: string;
   rotation: [number, number, number];
