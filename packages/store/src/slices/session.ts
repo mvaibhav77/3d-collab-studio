@@ -17,6 +17,7 @@ export interface SessionSlice {
   connectionStatus: ConnectionStatus;
   currentUserId: string | null;
   currentUserName: string | null;
+  sceneData: Record<string, any> | null;
 
   // Session History
   sessionHistory: SessionHistory;
@@ -52,6 +53,7 @@ export const createSessionSlice: StateCreator<
   connectionStatus: "disconnected",
   currentUserId: null,
   currentUserName: null,
+  sceneData: null,
   sessionHistory: {
     createdSessions: [],
     joinedSessions: [],
@@ -125,6 +127,7 @@ export const createSessionSlice: StateCreator<
     set({
       sessionId: session.id,
       sessionName: session.name,
+      sceneData: session.sceneData,
     });
   },
 

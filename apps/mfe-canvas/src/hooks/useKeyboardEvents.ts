@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { socket } from "../socket";
+import { useGlobalStore } from "@repo/store";
 
 interface UseKeyboardEventsProps {
   selectedObjectId: string | null;
@@ -8,19 +9,16 @@ interface UseKeyboardEventsProps {
 export const useKeyboardEvents = ({
   selectedObjectId,
 }: UseKeyboardEventsProps) => {
+  const sessionId = useGlobalStore((state) => state.sessionId);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Delete" && selectedObjectId) {
-        // Emit the remove event to the server
-        socket.emit("object:remove", { id: selectedObjectId });
+      if (event.key === "Delete" && selectedObjectId && sessionId) {
+        socket.emit("object:remove", { id: selectedObjectId, sessionId });
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
-
-    // Cleanup function to remove the listener
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedObjectId]);
+  }, [selectedObjectId, sessionId]);
 };

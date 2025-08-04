@@ -1,10 +1,10 @@
-import Box from "../shapes/Box";
 import Sphere from "../shapes/Sphere";
 import Cylinder from "../shapes/Cylinder";
 import Cone from "../shapes/Cone";
 import Torus from "../shapes/Torus";
 import type { SceneObject, ShapeType } from "@repo/types";
 import type { Mesh } from "@repo/three-wrapper";
+import Cube from "../shapes/Cube";
 
 interface SceneObjectsProps {
   objects: Record<string, SceneObject>;
@@ -14,7 +14,7 @@ interface SceneObjectsProps {
 }
 
 const ShapeComponents = {
-  box: Box,
+  cube: Cube,
   sphere: Sphere,
   cylinder: Cylinder,
   cone: Cone,

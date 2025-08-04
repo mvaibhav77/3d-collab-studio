@@ -8,6 +8,7 @@ import type {
 } from "@repo/types";
 import { config } from "../config/index.js";
 import { logger } from "../utils/logger.js";
+import { sessionService } from "../services/SessionService.js";
 
 type SocketServer = Server<ClientToServerEvents, ServerToClientEvents>;
 type SocketClient = Socket<ClientToServerEvents, ServerToClientEvents>;
@@ -37,21 +38,34 @@ export class SocketHandlers {
   /**
    * Handle color change events
    */
-  private handleColorChange(data: ColorChangeData): void {
+  private async handleColorChange(
+    data: ColorChangeData & { sessionId: string }
+  ): Promise<void> {
     // Validate color data
-    if (!data.color || data.color.length < 3) {
+    if (!data.color || data.color.length < 3 || !data.sessionId) {
       logger.warn(`Invalid color data received`, data);
       return;
     }
 
     logger.debug(`Received color change`, data);
 
-    // Clear existing timer for this object
     this.clearTimer(data.id);
 
-    // Throttle color updates to prevent spam
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       this.socket.broadcast.emit("object:color_change", data);
+      // Persist to DB
+      try {
+        const session = await sessionService.getSession(data.sessionId);
+        if (session) {
+          const sceneData = { ...session.sceneData };
+          if (sceneData[data.id]) {
+            sceneData[data.id].color = data.color;
+            await sessionService.updateSession(data.sessionId, sceneData);
+          }
+        }
+      } catch (err) {
+        logger.error("Failed to persist color change to DB", err);
+      }
       this.updateTimers.delete(data.id);
     }, config.socket.throttle.colorUpdateDelay);
 
@@ -61,37 +75,71 @@ export class SocketHandlers {
   /**
    * Handle scene object addition
    */
-  private handleAddObject(data: SceneObject): void {
+  private async handleAddObject(
+    data: SceneObject & { sessionId: string }
+  ): Promise<void> {
     logger.info(`Adding object`, { id: data.id, type: data.type });
 
-    // Validate object data
-    if (!data.id || !data.type) {
+    if (!data.id || !data.type || !data.sessionId) {
       logger.warn(`Invalid object data received`, data);
       return;
     }
 
     // Broadcast to all clients including sender
     this.io.emit("scene:add_object", data);
+
+    // Persist to DB
+    try {
+      const session = await sessionService.getSession(data.sessionId);
+      if (session) {
+        const sceneData = { ...session.sceneData };
+        sceneData[data.id] = {
+          id: data.id,
+          type: data.type,
+          position: data.position,
+          rotation: data.rotation,
+          scale: data.scale,
+          color: data.color,
+        };
+        await sessionService.updateSession(data.sessionId, sceneData);
+      }
+    } catch (err) {
+      logger.error("Failed to persist add object to DB", err);
+    }
   }
 
   /**
    * Handle transform (position, rotation, scale) changes
    */
-  private handleTransformChange(data: TransformChangeData): void {
+  private async handleTransformChange(
+    data: TransformChangeData & { sessionId: string }
+  ): Promise<void> {
     logger.debug(`Received transform change`, data);
 
-    // Validate transform data
-    if (!data.id) {
+    if (!data.id || !data.sessionId) {
       logger.warn(`Invalid transform data received`, data);
       return;
     }
 
-    // Clear existing timer for this object
     this.clearTimer(data.id);
 
-    // Throttle transform updates to prevent spam
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       this.socket.broadcast.emit("object:transform_change", data);
+      // Persist to DB
+      try {
+        const session = await sessionService.getSession(data.sessionId);
+        if (session) {
+          const sceneData = { ...session.sceneData };
+          if (sceneData[data.id]) {
+            sceneData[data.id].position = data.position;
+            sceneData[data.id].rotation = data.rotation;
+            sceneData[data.id].scale = data.scale;
+            await sessionService.updateSession(data.sessionId, sceneData);
+          }
+        }
+      } catch (err) {
+        logger.error("Failed to persist transform change to DB", err);
+      }
       this.updateTimers.delete(data.id);
     }, config.socket.throttle.transformUpdateDelay);
 
@@ -101,17 +149,30 @@ export class SocketHandlers {
   /**
    * Handle object removal
    */
-  private handleRemoveObject(data: { id: string }): void {
+  private async handleRemoveObject(data: {
+    id: string;
+    sessionId: string;
+  }): Promise<void> {
     logger.info(`Removing object`, { id: data.id });
 
-    // Validate object ID
-    if (!data.id) {
-      logger.warn(`Invalid object ID received for removal`, { id: data.id });
+    if (!data.id || !data.sessionId) {
+      logger.warn(`Invalid object ID received for removal`, data);
       return;
     }
 
-    // Broadcast to all clients (including sender) to remove the object
     this.io.emit("object:remove", { id: data.id });
+
+    // Persist to DB
+    try {
+      const session = await sessionService.getSession(data.sessionId);
+      if (session) {
+        const sceneData = { ...session.sceneData };
+        delete sceneData[data.id];
+        await sessionService.updateSession(data.sessionId, sceneData);
+      }
+    } catch (err) {
+      logger.error("Failed to persist remove object to DB", err);
+    }
   }
 
   /**

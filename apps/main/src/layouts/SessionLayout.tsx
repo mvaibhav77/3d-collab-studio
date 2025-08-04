@@ -19,7 +19,7 @@ const SessionLayout: React.FC = () => {
   logger.debug("SessionLayout rendered");
 
   return (
-    <div className="flex flex-1 h-screen overflow-hidden">
+    <div className="flex flex-1 h-full overflow-hidden">
       {/* Resizable Sidebar for Toolbar */}
       <ResizableSidebar minWidth={200} maxWidth={600} defaultWidth={320}>
         <SafeAsyncComponent fallback={<ToolbarFallback />}>

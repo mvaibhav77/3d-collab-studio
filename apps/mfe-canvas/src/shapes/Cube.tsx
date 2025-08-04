@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import type { Mesh } from "@repo/three-wrapper";
 
-const Box = forwardRef<
+const Cube = forwardRef<
   Mesh,
   {
     position: [number, number, number];
@@ -26,6 +26,6 @@ const Box = forwardRef<
   );
 });
 
-Box.displayName = "Box";
+Cube.displayName = "Cube";
 
-export default Box;
+export default Cube;

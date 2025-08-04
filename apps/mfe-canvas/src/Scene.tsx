@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import type { Mesh } from "@repo/three-wrapper";
 import { useGlobalStore } from "@repo/store";
@@ -27,7 +27,18 @@ export default function Scene() {
     selectedObjectId,
     setSelectedObjectId,
     transformMode,
+    setObjects,
+    sceneData,
   } = useGlobalStore();
+
+  // Hydrate canvas state from sceneData on mount or when sceneData changes
+  useEffect(() => {
+    if (sceneData) {
+      setObjects(
+        sceneData as { [id: string]: import("@repo/types").SceneObject }
+      );
+    }
+  }, [sceneData, setObjects]);
 
   // Socket event handling
   useSocketEvents({

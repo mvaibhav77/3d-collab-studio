@@ -91,7 +91,7 @@ export default function FreeRoamControls({
     };
 
     const onWheel = (event: WheelEvent) => {
-      event.preventDefault();
+      // event.preventDefault();
 
       // Zoom in/out by changing the radius
       spherical.current.radius += event.deltaY * zoomSpeed * 0.01;
@@ -114,7 +114,7 @@ export default function FreeRoamControls({
     domElement.addEventListener("mousedown", onMouseDown);
     document.addEventListener("mouseup", onMouseUp);
     document.addEventListener("mousemove", onMouseMove);
-    domElement.addEventListener("wheel", onWheel);
+    domElement.addEventListener("wheel", onWheel, { passive: true });
     domElement.addEventListener("mouseenter", onMouseEnter);
     domElement.addEventListener("mouseleave", onMouseLeave);
 
