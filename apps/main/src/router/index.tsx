@@ -3,26 +3,27 @@
  * Router configuration and route definitions
  */
 
-import { createBrowserRouter, type RouteObject } from 'react-router-dom';
-import { lazy } from 'react';
+import { createBrowserRouter, type RouteObject } from "react-router-dom";
+import { lazy } from "react";
 
 // Layout Components
-import RootLayout from '../layouts/RootLayout';
-import SessionLayout from '../layouts/SessionLayout';
+import RootLayout from "../layouts/RootLayout";
+import SessionLayout from "../layouts/SessionLayout";
 
 // Page Components (eager loaded for critical routes)
-import HomePage from '../pages/HomePage';
-import NotFoundPage from '../pages/NotFoundPage';
-import ErrorPage from '../pages/ErrorPage';
+import HomePage from "../pages/HomePage";
+import NotFoundPage from "../pages/NotFoundPage";
+import ErrorPage from "../pages/ErrorPage";
 
 // Lazy-loaded pages for better performance
-const SessionPage = lazy(() => import('../pages/SessionPage'));
-const JoinSessionPage = lazy(() => import('../pages/JoinSessionPage'));
+const SessionPage = lazy(() => import("../pages/SessionPage"));
+const JoinSessionPage = lazy(() => import("../pages/JoinSessionPage"));
+const CreateSessionPage = lazy(() => import("../pages/CreateSessionPage"));
 
 // Route definitions
 export const routes: RouteObject[] = [
   {
-    path: '/',
+    path: "/",
     element: <RootLayout />,
     errorElement: <ErrorPage />,
     children: [
@@ -31,11 +32,15 @@ export const routes: RouteObject[] = [
         element: <HomePage />,
       },
       {
-        path: 'join/:sessionId?',
+        path: "create",
+        element: <CreateSessionPage />,
+      },
+      {
+        path: "join/:sessionId?",
         element: <JoinSessionPage />,
       },
       {
-        path: 'session/:sessionId',
+        path: "session/:sessionId",
         element: <SessionLayout />,
         children: [
           {
@@ -45,7 +50,7 @@ export const routes: RouteObject[] = [
         ],
       },
       {
-        path: '*',
+        path: "*",
         element: <NotFoundPage />,
       },
     ],
@@ -62,8 +67,9 @@ export const router = createBrowserRouter(routes, {
 
 // Export route helpers
 export const ROUTES = {
-  HOME: '/',
-  JOIN: '/join',
+  HOME: "/",
+  CREATE: "/create",
+  JOIN: "/join",
   JOIN_SESSION: (sessionId: string) => `/join/${sessionId}`,
   SESSION: (sessionId: string) => `/session/${sessionId}`,
 } as const;

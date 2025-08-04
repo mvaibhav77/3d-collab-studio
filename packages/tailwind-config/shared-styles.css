@@ -116,3 +116,9 @@
   --canvas-grid: oklch(0.89 0.013 252.5);
   --canvas-plane: oklch(0.95 0.006 255.5);
 }
+
+@layer base {
+  button {
+    @apply cursor-pointer;
+  }
+}

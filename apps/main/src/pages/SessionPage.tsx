@@ -3,22 +3,51 @@
  * Main collaborative session interface
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGlobalStore } from "@repo/store";
 import { apiClient } from "../lib/api";
+import { ROUTES } from "../router/index";
 import { logger } from "../lib/dev";
 
 const SessionPage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
-  const { setSessionState, setConnectionStatus, updateSessionLastVisited } =
-    useGlobalStore();
+  const {
+    sessionHistory,
+    setSessionState,
+    setConnectionStatus,
+    updateSessionLastVisited,
+  } = useGlobalStore();
+
+  // Memoize session IDs for stable dependencies
+  const createdSessionIds = useMemo(
+    () => sessionHistory.createdSessions.map((s) => s.id).join(","),
+    [sessionHistory.createdSessions]
+  );
+  const joinedSessionIds = useMemo(
+    () => sessionHistory.joinedSessions.map((s) => s.id).join(","),
+    [sessionHistory.joinedSessions]
+  );
 
   useEffect(() => {
     if (!sessionId) {
       logger.warn("SessionPage: No sessionId provided, redirecting to home");
       navigate("/", { replace: true });
+      return;
+    }
+
+    // Check if user has access to this session (is in created or joined sessions)
+    const hasAccess =
+      createdSessionIds.split(",").includes(sessionId) ||
+      joinedSessionIds.split(",").includes(sessionId);
+
+    if (!hasAccess) {
+      logger.info(
+        "SessionPage: User has no access to session, redirecting to join page",
+        sessionId
+      );
+      navigate(ROUTES.JOIN_SESSION(sessionId), { replace: true });
       return;
     }
 
@@ -31,7 +60,8 @@ const SessionPage: React.FC = () => {
 
         if (!session) {
           logger.error("SessionPage: Session not found", sessionId);
-          navigate("/", { replace: true });
+          // If session doesn't exist, redirect to join page with error context
+          navigate(ROUTES.JOIN_SESSION(sessionId), { replace: true });
           return;
         }
 
@@ -43,7 +73,8 @@ const SessionPage: React.FC = () => {
       } catch (error) {
         logger.error("SessionPage: Failed to load session", error);
         setConnectionStatus("disconnected");
-        navigate("/", { replace: true });
+        // On error, redirect to join page instead of home
+        navigate(ROUTES.JOIN_SESSION(sessionId), { replace: true });
       }
     };
 
@@ -51,6 +82,8 @@ const SessionPage: React.FC = () => {
   }, [
     sessionId,
     navigate,
+    createdSessionIds,
+    joinedSessionIds,
     setSessionState,
     setConnectionStatus,
     updateSessionLastVisited,

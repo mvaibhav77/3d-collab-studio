@@ -1,28 +1,20 @@
 /**
- * Join Session Page Component
- * Page for joining sessions with session history
+ * Create Session Page Component
+ * Page for creating new sessions with session history
  */
 
-import React, { useEffect, useState } from "react";
-import { MoveLeft, User } from "@repo/ui/icons";
+import React, { useState } from "react";
+import { MoveLeft, FileText } from "@repo/ui/icons";
 import SessionForm from "../components/session/SessionForm";
 import SessionHistoryCard from "../components/session/SessionHistoryCard";
 import ErrorAlert from "../components/session/ErrorAlert";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useGlobalStore, sessionHistoryHelpers } from "@repo/store";
 import { apiClient } from "../lib/api";
 import { ROUTES } from "../router/index";
-import { logger } from "../lib/dev";
 import type { SessionHistoryItem } from "@repo/types";
 
-// Utility functions
-const extractSessionId = (urlOrId: string): string => {
-  if (urlOrId.includes("/session/")) {
-    return urlOrId.split("/session/")[1].split("?")[0];
-  }
-  return urlOrId.trim();
-};
-
+// Utility function for formatting dates
 const formatLastVisited = (lastVisited: Date): string => {
   const date =
     lastVisited instanceof Date ? lastVisited : new Date(lastVisited);
@@ -39,80 +31,60 @@ const formatLastVisited = (lastVisited: Date): string => {
   return date.toLocaleDateString();
 };
 
-const JoinSessionPage: React.FC = () => {
-  const { sessionId: urlSessionId } = useParams<{ sessionId?: string }>();
-  const navigate = useNavigate();
-
-  const [sessionInput, setSessionInput] = useState(urlSessionId || "");
+const CreateSessionPage: React.FC = () => {
+  const [sessionName, setSessionName] = useState("");
   const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
 
   const {
     sessionHistory,
     setCurrentUser,
-    addToJoinedSessions,
+    addToCreatedSessions,
     updateSessionLastVisited,
   } = useGlobalStore();
 
   const sessionsPerPage = 5;
   const totalPages = Math.ceil(
-    sessionHistory.joinedSessions.length / sessionsPerPage
+    sessionHistory.createdSessions.length / sessionsPerPage
   );
   const startIndex = (currentPage - 1) * sessionsPerPage;
-  const currentSessions = sessionHistory.joinedSessions.slice(
+  const currentSessions = sessionHistory.createdSessions.slice(
     startIndex,
     startIndex + sessionsPerPage
   );
 
-  // Set session ID from URL if provided
-  useEffect(() => {
-    if (urlSessionId) {
-      setSessionInput(urlSessionId);
-      logger.info(
-        "JoinSessionPage: Pre-filled session ID from URL",
-        urlSessionId
-      );
-    }
-  }, [urlSessionId]);
-
-  const handleJoinSession = async () => {
-    if (!sessionInput.trim() || !userName.trim()) return;
+  const handleCreateSession = async () => {
+    if (!sessionName.trim() || !userName.trim()) return;
 
     setIsLoading(true);
     setError(null);
 
-    // Extract session ID from URL using utility function
-    const sessionId = extractSessionId(sessionInput);
-
     try {
-      logger.info("JoinSessionPage: Attempting to join session", sessionId);
-
-      const response = await apiClient.joinSession({
-        sessionId,
-        userName: userName.trim(),
+      const response = await apiClient.createSession({
+        name: sessionName,
+        userName: userName,
       });
 
       // Update store with new session history
       const historyItem = sessionHistoryHelpers.createHistoryItem(
-        sessionId,
-        response.session.name
+        response.sessionId,
+        sessionName
       );
-      addToJoinedSessions(historyItem);
+      addToCreatedSessions(historyItem);
 
       // Set current user
-      setCurrentUser(response.userId || "temp_" + Date.now(), userName.trim());
-
-      logger.info("JoinSessionPage: Successfully joined session", response);
+      setCurrentUser("temp_" + Date.now(), userName);
 
       // Navigate to session
-      navigate(ROUTES.SESSION(sessionId));
+      navigate(ROUTES.SESSION(response.sessionId));
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to join session";
+        error instanceof Error ? error.message : "Failed to create session";
       setError(errorMessage);
-      logger.error("JoinSessionPage: Failed to join session", error);
+      console.error("Failed to create session:", error);
     } finally {
       setIsLoading(false);
     }
@@ -140,23 +112,22 @@ const JoinSessionPage: React.FC = () => {
             <MoveLeft className="w-6 h-6 mr-2" />
           </button>
           <div className="">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Join Session
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+              Create New Session
             </h1>
             <p className="text-gray-600 mt-2">
-              Connect to an existing workspace
+              Start a new collaborative 3D workspace
             </p>
           </div>
-          <div className="w-24"></div> {/* Spacer for center alignment */}
         </div>
 
         {/* Error Display */}
         <ErrorAlert error={error} />
 
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Join Session Form */}
+          {/* Create Session Form */}
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-8 py-6">
+            <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-6">
               <h2 className="text-2xl font-bold text-white flex items-center">
                 {/* Custom SVG for card header (kept as per user request) */}
                 <svg
@@ -166,45 +137,44 @@ const JoinSessionPage: React.FC = () => {
                 >
                   <path
                     fillRule="evenodd"
-                    d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zM12 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1V4zM12 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-3z"
+                    d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
                     clipRule="evenodd"
                   />
                 </svg>
-                Join Details
+                Session Details
               </h2>
-              <p className="text-blue-100 mt-1">
-                Enter your details to join the workspace
+              <p className="text-green-100 mt-1">
+                Fill in the details to create your workspace
               </p>
             </div>
             <div className="p-8">
               <SessionForm
                 userName={userName}
                 setUserName={setUserName}
-                sessionInput={sessionInput}
-                setSessionInput={setSessionInput}
+                sessionName={sessionName}
+                setSessionName={setSessionName}
                 isLoading={isLoading}
-                onSubmit={handleJoinSession}
-                submitLabel="Join Session"
-                urlSessionId={urlSessionId}
+                onSubmit={handleCreateSession}
+                submitLabel="Create Session"
               />
             </div>
           </div>
 
-          {/* Joined Sessions History */}
+          {/* Session History */}
           <SessionHistoryCard
-            title="My Joined Sessions"
-            subtitle="Collaborative workspaces you're part of"
+            title="My Created Sessions"
+            subtitle="Sessions you've created and own"
             sessions={currentSessions}
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}
             onSessionClick={handleSessionClick}
-            emptyIcon={<User className="w-6 h-6 text-gray-300 mr-3" />}
-            emptyTitle="No sessions joined yet"
-            emptySubtitle="Join your first session to get started"
+            emptyIcon={<FileText className="w-6 h-6 text-gray-300 mr-3" />}
+            emptyTitle="No sessions created yet"
+            emptySubtitle="Create your first session to get started"
             formatLastVisited={formatLastVisited}
-            sessionNameClass="group-hover:text-orange-700"
-            sessionHoverClass="hover:border-orange-300 hover:bg-orange-50"
+            sessionNameClass="group-hover:text-purple-700"
+            sessionHoverClass="hover:border-purple-300 hover:bg-purple-50"
             paginationColorClass=""
           />
         </div>
@@ -213,4 +183,4 @@ const JoinSessionPage: React.FC = () => {
   );
 };
 
-export default JoinSessionPage;
+export default CreateSessionPage;

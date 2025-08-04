@@ -17,7 +17,7 @@ const RootLayout: React.FC = () => {
       <Header />
 
       {/* Page Content */}
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-y-scroll">
         <Outlet />
       </main>
     </div>
