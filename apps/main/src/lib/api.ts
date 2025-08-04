@@ -44,6 +44,15 @@ class ApiClient {
     }
   }
 
+  // Health check
+  async health(): Promise<{
+    status: string;
+    timestamp: string;
+    uptime: number;
+  }> {
+    return this.request("/health");
+  }
+
   // Session API methods
   async createSession(
     request: CreateSessionRequest
@@ -55,10 +64,13 @@ class ApiClient {
   }
 
   async joinSession(request: JoinSessionRequest): Promise<JoinSessionResponse> {
-    return this.request<JoinSessionResponse>("/api/sessions/join", {
-      method: "POST",
-      body: JSON.stringify(request),
-    });
+    return this.request<JoinSessionResponse>(
+      `/api/sessions/${request.sessionId}/join`,
+      {
+        method: "POST",
+        body: JSON.stringify({ userName: request.userName }),
+      }
+    );
   }
 
   async getSession(sessionId: string): Promise<CollaborativeSession> {

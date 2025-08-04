@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useGlobalStore, sessionHistoryHelpers } from "@repo/store";
 import { apiClient } from "../lib/api";
+import { ROUTES } from "../router/index";
 import type { SessionHistoryItem } from "@repo/types";
 
 // Utility functions moved to component level
@@ -33,6 +35,7 @@ export const SessionHistory: React.FC = () => {
   const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const {
     sessionHistory,
@@ -64,8 +67,8 @@ export const SessionHistory: React.FC = () => {
       // Set current user
       setCurrentUser("temp_" + Date.now(), userName);
 
-      // Navigate to session (in real app, use router)
-      window.location.href = `/session/${response.sessionId}`;
+      // Navigate to session
+      navigate(ROUTES.SESSION(response.sessionId));
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to create session";
@@ -102,7 +105,7 @@ export const SessionHistory: React.FC = () => {
       setCurrentUser("temp_" + Date.now(), userName);
 
       // Navigate to session
-      window.location.href = `/session/${sessionId}`;
+      navigate(ROUTES.SESSION(sessionId));
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to join session";
@@ -118,7 +121,7 @@ export const SessionHistory: React.FC = () => {
     updateSessionLastVisited(session.id);
 
     // Navigate to session
-    window.location.href = session.url;
+    navigate(ROUTES.SESSION(session.id));
   };
 
   return (

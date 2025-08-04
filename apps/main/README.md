@@ -124,12 +124,41 @@ The following path aliases are configured:
 
 ## Architecture
 
-The main app follows a micro-frontend architecture:
+The main app follows a micro-frontend architecture with React Router for navigation:
 
 - **Host App** (this app) - Main container and routing
 - **Toolbar MFE** - Tools and controls (port 5001)
 - **Canvas MFE** - 3D rendering canvas (port 5002)
 - **API Server** - Backend services (port 3001)
+
+### Routing Structure
+
+```
+/                     - Home page (SessionHistory)
+/join                 - Join session form
+/join/:sessionId      - Pre-filled join form
+/session/:sessionId   - Collaborative session
+```
+
+### Components Structure
+
+```
+src/
+├── layouts/
+│   ├── RootLayout.tsx       # Main app wrapper
+│   └── SessionLayout.tsx    # Session-specific layout
+├── pages/
+│   ├── HomePage.tsx         # Landing page
+│   ├── SessionPage.tsx      # Main session interface
+│   ├── JoinSessionPage.tsx  # Join session form
+│   ├── ErrorPage.tsx        # Error boundary
+│   └── NotFoundPage.tsx     # 404 page
+├── router/
+│   ├── index.tsx           # Route definitions
+│   └── hooks.ts            # Navigation hooks
+└── lib/
+    └── navigation.ts       # Navigation utilities
+```
 
 All configuration is environment-aware and deployment-ready.
 

@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
       host: true,
       cors: true,
       hmr: {
-        port: 3001,
+        port: 3003,
       },
     },
 

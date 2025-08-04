@@ -1,15 +1,18 @@
 import express from "express";
+import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import type { ServerToClientEvents, ClientToServerEvents } from "@repo/types";
 import { config } from "../config/index.js";
 import { logger } from "../utils/logger.js";
 import { SocketHandlers } from "../handlers/socketHandlers.js";
+import { SessionService } from "../services/SessionService.js";
 
 export class ApiServer {
   private app: express.Application;
   private server: http.Server;
   private io: Server<ClientToServerEvents, ServerToClientEvents>;
+  private sessionService: SessionService;
 
   constructor() {
     this.app = express();
@@ -20,8 +23,10 @@ export class ApiServer {
         cors: config.socket.cors,
       }
     );
+    this.sessionService = new SessionService();
 
     this.setupMiddleware();
+    this.setupApiRoutes();
     this.setupSocketHandlers();
   }
 
@@ -29,7 +34,10 @@ export class ApiServer {
    * Setup Express middleware
    */
   private setupMiddleware(): void {
-    // Add any Express middleware here if needed
+    // Enable CORS for all routes
+    this.app.use(cors(config.cors));
+
+    // Parse JSON bodies
     this.app.use(express.json());
 
     // Health check endpoint
@@ -39,6 +47,73 @@ export class ApiServer {
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
       });
+    });
+  }
+
+  /**
+   * Setup API routes
+   */
+  private setupApiRoutes(): void {
+    // Sessions API routes
+    this.app.post("/api/sessions", async (req, res) => {
+      try {
+        const { name, userName } = req.body;
+        const response = await this.sessionService.createSession({
+          name,
+          userName,
+        });
+        res.status(201).json(response);
+      } catch (error) {
+        logger.error("Error creating session", { error });
+        res.status(500).json({ error: "Failed to create session" });
+      }
+    });
+
+    this.app.get("/api/sessions/:id", async (req, res) => {
+      try {
+        const session = await this.sessionService.getSession(req.params.id);
+        if (!session) {
+          return res.status(404).json({ error: "Session not found" });
+        }
+        res.json(session);
+      } catch (error) {
+        logger.error("Error fetching session", {
+          error,
+          sessionId: req.params.id,
+        });
+        res.status(500).json({ error: "Failed to fetch session" });
+      }
+    });
+
+    this.app.post("/api/sessions/:id/join", async (req, res) => {
+      try {
+        const { userName } = req.body;
+        const response = await this.sessionService.joinSession({
+          sessionId: req.params.id,
+          userName,
+        });
+        res.json(response);
+      } catch (error) {
+        logger.error("Error joining session", {
+          error,
+          sessionId: req.params.id,
+        });
+        res.status(500).json({ error: "Failed to join session" });
+      }
+    });
+
+    this.app.put("/api/sessions/:id", async (req, res) => {
+      try {
+        const { sceneData } = req.body;
+        await this.sessionService.updateSession(req.params.id, sceneData);
+        res.status(200).json({ success: true });
+      } catch (error) {
+        logger.error("Error updating session", {
+          error,
+          sessionId: req.params.id,
+        });
+        res.status(500).json({ error: "Failed to update session" });
+      }
     });
   }
 
