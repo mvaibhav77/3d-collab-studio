@@ -4,10 +4,18 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite --host --port 3000",
+    "dev:production": "vite --host --port 3000 --mode production",
     "build": "tsc -b && vite build",
+    "build:staging": "tsc -b && vite build --mode staging",
+    "build:production": "tsc -b && vite build --mode production",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "lint:fix": "eslint . --fix",
+    "preview": "vite preview --port 3000",
+    "preview:staging": "vite preview --port 3000 --mode staging",
+    "preview:production": "vite preview --port 3000 --mode production",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist && rm -rf .turbo"
   },
   "dependencies": {
     "@react-three/drei": "^10.6.1",

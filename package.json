@@ -3,10 +3,21 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "build:staging": "turbo run build:staging",
+    "build:production": "turbo run build:production",
     "dev": "turbo run dev",
+    "dev:main": "pnpm --filter=main dev",
+    "dev:api": "pnpm --filter=api dev",
+    "dev:toolbar": "pnpm --filter=mfe-toolbar dev",
+    "dev:all": "concurrently \"pnpm dev:api\" \"pnpm dev:main\" \"pnpm dev:toolbar\"",
     "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
+    "clean": "turbo run clean && rm -rf node_modules/.cache",
+    "preview": "turbo run preview",
+    "preview:staging": "turbo run preview:staging",
+    "preview:production": "turbo run preview:production",
     "db:migrate": "pnpm --filter=api db:migrate:simple",
     "db:studio": "pnpm --filter=api db:studio",
     "db:reset": "pnpm --filter=api db:reset",
@@ -15,6 +26,7 @@
     "db:check": "pnpm --filter=api db:check"
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "prettier": "^3.6.2",
     "turbo": "^2.5.5",
     "typescript": "5.8.3"

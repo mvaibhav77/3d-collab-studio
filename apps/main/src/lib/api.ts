@@ -5,9 +5,7 @@ import type {
   JoinSessionResponse,
   CollaborativeSession,
 } from "@repo/types";
-
-// API configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+import { config } from "./config";
 
 // HTTP client wrapper
 class ApiClient {
@@ -79,7 +77,7 @@ class ApiClient {
 }
 
 // Export singleton instance
-export const apiClient = new ApiClient(API_BASE_URL);
+export const apiClient = new ApiClient(config.apiBaseUrl);
 
 // Export types for convenience
 export type { ApiClient };
