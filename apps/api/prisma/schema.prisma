@@ -1,0 +1,21 @@
+// Simplified Prisma schema for 3D collaboration
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  // Scene data stored as JSON - contains all objects and state
+  sceneData Json     @default("{}") @map("scene_data")
+  
+  @@map("sessions")
+}

@@ -7,8 +7,6 @@ import type {
   SessionUser,
   ConnectionStatus,
   CollaborativeSession,
-  SessionHistoryItem,
-  SessionHistory,
 } from "@repo/types";
 
 // Simplified store interface
@@ -33,13 +31,6 @@ interface GlobalState {
   connectionStatus: ConnectionStatus;
   currentUserId: string | null;
   currentUserName: string | null;
-
-  // Session History - NEW
-  sessionHistory: SessionHistory;
-  addToCreatedSessions: (session: SessionHistoryItem) => void;
-  addToJoinedSessions: (session: SessionHistoryItem) => void;
-  updateSessionLastVisited: (sessionId: string) => void;
-  clearSessionHistory: () => void;
 
   // Session Actions - SIMPLIFIED
   createSession: (name: string, userName: string) => Promise<string>;
@@ -100,95 +91,13 @@ export const useGlobalStore = create<GlobalState>()(
       currentUserId: null,
       currentUserName: null,
 
-      // Session History - NEW
-      sessionHistory: {
-        createdSessions: [],
-        joinedSessions: [],
-      },
-
-      addToCreatedSessions: (session: SessionHistoryItem) => {
-        set(
-          produce((state) => {
-            // Remove if already exists (avoid duplicates)
-            state.sessionHistory.createdSessions =
-              state.sessionHistory.createdSessions.filter(
-                (s: SessionHistoryItem) => s.id !== session.id
-              );
-            // Add to beginning of list (most recent first)
-            state.sessionHistory.createdSessions.unshift(session);
-          })
-        );
-      },
-
-      addToJoinedSessions: (session: SessionHistoryItem) => {
-        set(
-          produce((state) => {
-            // Remove if already exists (avoid duplicates)
-            state.sessionHistory.joinedSessions =
-              state.sessionHistory.joinedSessions.filter(
-                (s: SessionHistoryItem) => s.id !== session.id
-              );
-            // Add to beginning of list (most recent first)
-            state.sessionHistory.joinedSessions.unshift(session);
-          })
-        );
-      },
-
-      updateSessionLastVisited: (sessionId: string) => {
-        set(
-          produce((state) => {
-            const now = new Date();
-            // Update in created sessions
-            const createdSession = state.sessionHistory.createdSessions.find(
-              (s: SessionHistoryItem) => s.id === sessionId
-            );
-            if (createdSession) {
-              createdSession.lastVisited = now;
-            }
-            // Update in joined sessions
-            const joinedSession = state.sessionHistory.joinedSessions.find(
-              (s: SessionHistoryItem) => s.id === sessionId
-            );
-            if (joinedSession) {
-              joinedSession.lastVisited = now;
-            }
-          })
-        );
-      },
-
-      clearSessionHistory: () => {
-        set({
-          sessionHistory: {
-            createdSessions: [],
-            joinedSessions: [],
-          },
-        });
-      },
-
       // Session Actions - SIMPLIFIED (placeholder implementations)
       createSession: async (
         name: string,
         userName: string
       ): Promise<string> => {
         console.log("Creating session:", name, "for user:", userName);
-
-        // TODO: Replace with actual API call
-        const mockSessionId =
-          "session_" + Math.random().toString(36).substr(2, 9);
-
-        // Add to created sessions history
-        const sessionHistoryItem: SessionHistoryItem = {
-          id: mockSessionId,
-          name: name,
-          lastVisited: new Date(),
-          url: `/session/${mockSessionId}`,
-        };
-
-        // Get current state to access the method
-        const { addToCreatedSessions } = useGlobalStore.getState();
-        addToCreatedSessions(sessionHistoryItem);
-
-        return mockSessionId;
+        throw new Error("createSession not implemented yet");
       },
 
       joinSession: async (
@@ -196,21 +105,7 @@ export const useGlobalStore = create<GlobalState>()(
         userName: string
       ): Promise<void> => {
         console.log("Joining session:", sessionId, "as:", userName);
-
-        // TODO: Replace with actual API call that returns session name
-        const mockSessionName = "Session " + sessionId.substr(-4);
-
-        // Add to joined sessions history
-        const sessionHistoryItem: SessionHistoryItem = {
-          id: sessionId,
-          name: mockSessionName,
-          lastVisited: new Date(),
-          url: `/session/${sessionId}`,
-        };
-
-        // Get current state to access the method
-        const { addToJoinedSessions } = useGlobalStore.getState();
-        addToJoinedSessions(sessionHistoryItem);
+        throw new Error("joinSession not implemented yet");
       },
 
       leaveSession: () => {
@@ -239,7 +134,7 @@ export const useGlobalStore = create<GlobalState>()(
         set(
           produce((state) => {
             const existingIndex = state.sessionUsers.findIndex(
-              (u: SessionUser) => u.id === user.id
+              (u) => u.id === user.id
             );
             if (existingIndex >= 0) {
               state.sessionUsers[existingIndex] = user;
@@ -254,7 +149,7 @@ export const useGlobalStore = create<GlobalState>()(
         set(
           produce((state) => {
             state.sessionUsers = state.sessionUsers.filter(
-              (u: SessionUser) => u.id !== userId
+              (u) => u.id !== userId
             );
           })
         );
@@ -263,9 +158,7 @@ export const useGlobalStore = create<GlobalState>()(
       updateSessionUser: (userId: string, updates: Partial<SessionUser>) => {
         set(
           produce((state) => {
-            const user = state.sessionUsers.find(
-              (u: SessionUser) => u.id === userId
-            );
+            const user = state.sessionUsers.find((u) => u.id === userId);
             if (user) {
               Object.assign(user, updates);
             }
@@ -280,8 +173,8 @@ export const useGlobalStore = create<GlobalState>()(
     {
       name: "global-store",
       partialize: (state) => ({
-        // Persist session history and basic user info
-        sessionHistory: state.sessionHistory,
+        // Only persist basic session info, not full state
+        sessionId: state.sessionId,
         currentUserName: state.currentUserName,
       }),
     }

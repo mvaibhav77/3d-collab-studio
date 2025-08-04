@@ -1,0 +1,91 @@
+import { PrismaClient } from "@prisma/client";
+import type { CollaborativeSession } from "@repo/types";
+
+export class DatabaseService {
+  private prisma: PrismaClient;
+
+  constructor() {
+    this.prisma = new PrismaClient();
+  }
+
+  async connect(): Promise<void> {
+    try {
+      await this.prisma.$connect();
+      console.log("Connected to PostgreSQL database");
+    } catch (error) {
+      console.error("Failed to connect to database:", error);
+      throw error;
+    }
+  }
+
+  async disconnect(): Promise<void> {
+    await this.prisma.$disconnect();
+  }
+
+  // Create a new session
+  async createSession(name: string): Promise<CollaborativeSession> {
+    const session = await this.prisma.session.create({
+      data: {
+        name,
+        sceneData: {},
+      },
+    });
+
+    return {
+      id: session.id,
+      name: session.name,
+      createdAt: session.createdAt,
+      updatedAt: session.updatedAt,
+      sceneData: session.sceneData as Record<string, any>,
+      participants: [],
+    };
+  }
+
+  // Get session by ID
+  async getSession(sessionId: string): Promise<CollaborativeSession | null> {
+    const session = await this.prisma.session.findUnique({
+      where: { id: sessionId },
+    });
+
+    if (!session) return null;
+
+    return {
+      id: session.id,
+      name: session.name,
+      createdAt: session.createdAt,
+      updatedAt: session.updatedAt,
+      sceneData: session.sceneData as Record<string, any>,
+      participants: [], // Populated at runtime via Socket.IO
+    };
+  }
+
+  // Update session scene data
+  async updateSession(
+    sessionId: string,
+    sceneData: Record<string, any>
+  ): Promise<void> {
+    await this.prisma.session.update({
+      where: { id: sessionId },
+      data: {
+        sceneData,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  // Delete session
+  async deleteSession(sessionId: string): Promise<boolean> {
+    try {
+      await this.prisma.session.delete({
+        where: { id: sessionId },
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+}
+
+// Export singleton instance
+export const databaseService = new DatabaseService();
+export default databaseService;

@@ -24,6 +24,33 @@ export interface TransformChangeData {
 // UI and Transform Types
 export type TransformMode = "translate" | "rotate" | "scale";
 
+// Session Types - SIMPLIFIED
+export interface SessionUser {
+  id: string;
+  name: string;
+  color: string; // User's cursor/selection color
+  isOnline: boolean;
+}
+
+export interface CollaborativeSession {
+  id: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+
+  // Scene data stored as JSON
+  sceneData: Record<string, any>;
+
+  // Active participants
+  participants: SessionUser[];
+}
+
+export type ConnectionStatus =
+  | "disconnected"
+  | "connecting"
+  | "connected"
+  | "error";
+
 // Socket Event Data Types
 export interface ColorChangeData {
   id: string;
@@ -32,15 +59,94 @@ export interface ColorChangeData {
 
 // Socket Event Interface Types
 export interface ServerToClientEvents {
+  // Existing object events
   "object:color_change": (data: ColorChangeData) => void;
   "object:transform_change": (data: TransformChangeData) => void;
   "scene:add_object": (data: SceneObject) => void;
   "object:remove": (data: { id: string }) => void;
+
+  // New session events
+  "session:state": (data: CollaborativeSession) => void;
+  "session:user_joined": (data: { user: SessionUser }) => void;
+  "session:user_left": (data: { userId: string }) => void;
+  "session:user_cursor_update": (data: {
+    userId: string;
+    cursor: { x: number; y: number; z: number };
+  }) => void;
+  "session:user_selection_update": (data: {
+    userId: string;
+    selectedObjectId: string | null;
+  }) => void;
+  "session:error": (data: { message: string }) => void;
 }
 
 export interface ClientToServerEvents {
-  "object:color_change": (data: ColorChangeData) => void;
-  "object:transform_change": (data: TransformChangeData) => void;
-  "scene:add_object": (data: SceneObject) => void;
-  "object:remove": (data: { id: string }) => void;
+  // Existing object events
+  "object:color_change": (
+    data: ColorChangeData & { sessionId: string }
+  ) => void;
+  "object:transform_change": (
+    data: TransformChangeData & { sessionId: string }
+  ) => void;
+  "scene:add_object": (data: SceneObject & { sessionId: string }) => void;
+  "object:remove": (data: { id: string; sessionId: string }) => void;
+
+  // New session events
+  "session:join": (data: {
+    sessionId: string;
+    userId: string;
+    userName: string;
+  }) => void;
+  "session:leave": (data: { sessionId: string; userId: string }) => void;
+  "session:cursor_update": (data: {
+    sessionId: string;
+    userId: string;
+    cursor: { x: number; y: number; z: number };
+  }) => void;
+  "session:selection_update": (data: {
+    sessionId: string;
+    userId: string;
+    selectedObjectId: string | null;
+  }) => void;
+}
+
+// API Response Types
+// Session History Types
+export interface SessionHistoryItem {
+  id: string;
+  name: string;
+  lastVisited: Date;
+  url: string;
+}
+
+export interface SessionHistory {
+  createdSessions: SessionHistoryItem[];
+  joinedSessions: SessionHistoryItem[];
+}
+
+// API Types - SIMPLIFIED
+export interface CreateSessionRequest {
+  name: string;
+  userName: string;
+}
+
+export interface CreateSessionResponse {
+  sessionId: string;
+  session: CollaborativeSession;
+}
+
+export interface JoinSessionRequest {
+  sessionId: string;
+  userName: string;
+}
+
+export interface JoinSessionResponse {
+  session: CollaborativeSession;
+  userId: string; // Assigned user ID for this session
+}
+
+export interface ApiError {
+  error: string;
+  message: string;
+  statusCode: number;
 }
