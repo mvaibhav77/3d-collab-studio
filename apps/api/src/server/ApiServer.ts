@@ -7,14 +7,16 @@ import { config } from "../config/index.js";
 import { logger } from "../utils/logger.js";
 import { SocketHandlers } from "../handlers/socketHandlers.js";
 import { SessionService } from "../services/SessionService.js";
+import { DatabaseService } from "../database/DatabaseService.js";
 
 export class ApiServer {
   private app: express.Application;
   private server: http.Server;
   private io: Server<ClientToServerEvents, ServerToClientEvents>;
   private sessionService: SessionService;
+  private db: DatabaseService;
 
-  constructor() {
+  constructor(db: DatabaseService) {
     this.app = express();
     this.server = http.createServer(this.app);
     this.io = new Server<ClientToServerEvents, ServerToClientEvents>(
@@ -23,11 +25,13 @@ export class ApiServer {
         cors: config.socket.cors,
       }
     );
-    this.sessionService = new SessionService();
+    this.setupSocketHandlers();
+
+    this.db = db;
+    this.sessionService = new SessionService(this.db, this.io);
 
     this.setupMiddleware();
     this.setupApiRoutes();
-    this.setupSocketHandlers();
   }
 
   /**
@@ -62,6 +66,7 @@ export class ApiServer {
           name,
           userName,
         });
+
         res.status(201).json(response);
       } catch (error) {
         logger.error("Error creating session", { error });
@@ -125,7 +130,7 @@ export class ApiServer {
       logger.info(`User connected`, { socketId: socket.id });
 
       // Create handlers instance for this socket
-      const handlers = new SocketHandlers(this.io, socket);
+      const handlers = new SocketHandlers(this.io, socket, this.sessionService);
       handlers.registerHandlers();
     });
   }

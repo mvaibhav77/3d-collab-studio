@@ -37,7 +37,6 @@ export class DatabaseService {
       createdAt: session.createdAt,
       updatedAt: session.updatedAt,
       sceneData: session.sceneData as Record<string, any>,
-      participants: [],
     };
   }
 
@@ -55,7 +54,6 @@ export class DatabaseService {
       createdAt: session.createdAt,
       updatedAt: session.updatedAt,
       sceneData: session.sceneData as Record<string, any>,
-      participants: [], // Populated at runtime via Socket.IO
     };
   }
 
@@ -84,8 +82,4 @@ export class DatabaseService {
       return false;
     }
   }
-}
-
-// Export singleton instance
-export const databaseService = new DatabaseService();
-export default databaseService;
+};

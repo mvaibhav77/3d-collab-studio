@@ -5,21 +5,26 @@ import type {
   ColorChangeData,
   SceneObject,
   TransformChangeData,
+  SessionUser,
 } from "@repo/types";
 import { config } from "../config/index.js";
 import { logger } from "../utils/logger.js";
-import { sessionService } from "../services/SessionService.js";
+import type { SessionService } from "../services/SessionService.js";
 
 type SocketServer = Server<ClientToServerEvents, ServerToClientEvents>;
 type SocketClient = Socket<ClientToServerEvents, ServerToClientEvents>;
 
 export class SocketHandlers {
   private updateTimers = new Map<string, NodeJS.Timeout>();
+  private sessionService: SessionService;
 
   constructor(
     private io: SocketServer,
-    private socket: SocketClient
-  ) {}
+    private socket: SocketClient,
+    sessionService: SessionService
+  ) {
+    this.sessionService = sessionService;
+  }
 
   /**
    * Register all socket event handlers
@@ -33,6 +38,7 @@ export class SocketHandlers {
     );
     this.socket.on("object:remove", this.handleRemoveObject.bind(this));
     this.socket.on("disconnect", this.handleDisconnect.bind(this));
+    this.socket.on("session:join", this.handleJoinSession.bind(this));
   }
 
   /**
@@ -55,12 +61,12 @@ export class SocketHandlers {
       this.socket.broadcast.emit("object:color_change", data);
       // Persist to DB
       try {
-        const session = await sessionService.getSession(data.sessionId);
+        const session = await this.sessionService.getSession(data.sessionId);
         if (session) {
           const sceneData = { ...session.sceneData };
           if (sceneData[data.id]) {
             sceneData[data.id].color = data.color;
-            await sessionService.updateSession(data.sessionId, sceneData);
+            await this.sessionService.updateSession(data.sessionId, sceneData);
           }
         }
       } catch (err) {
@@ -90,7 +96,7 @@ export class SocketHandlers {
 
     // Persist to DB
     try {
-      const session = await sessionService.getSession(data.sessionId);
+      const session = await this.sessionService.getSession(data.sessionId);
       if (session) {
         const sceneData = { ...session.sceneData };
         sceneData[data.id] = {
@@ -101,7 +107,7 @@ export class SocketHandlers {
           scale: data.scale,
           color: data.color,
         };
-        await sessionService.updateSession(data.sessionId, sceneData);
+        await this.sessionService.updateSession(data.sessionId, sceneData);
       }
     } catch (err) {
       logger.error("Failed to persist add object to DB", err);
@@ -127,14 +133,14 @@ export class SocketHandlers {
       this.socket.broadcast.emit("object:transform_change", data);
       // Persist to DB
       try {
-        const session = await sessionService.getSession(data.sessionId);
+        const session = await this.sessionService.getSession(data.sessionId);
         if (session) {
           const sceneData = { ...session.sceneData };
           if (sceneData[data.id]) {
             sceneData[data.id].position = data.position;
             sceneData[data.id].rotation = data.rotation;
             sceneData[data.id].scale = data.scale;
-            await sessionService.updateSession(data.sessionId, sceneData);
+            await this.sessionService.updateSession(data.sessionId, sceneData);
           }
         }
       } catch (err) {
@@ -164,11 +170,11 @@ export class SocketHandlers {
 
     // Persist to DB
     try {
-      const session = await sessionService.getSession(data.sessionId);
+      const session = await this.sessionService.getSession(data.sessionId);
       if (session) {
         const sceneData = { ...session.sceneData };
         delete sceneData[data.id];
-        await sessionService.updateSession(data.sessionId, sceneData);
+        await this.sessionService.updateSession(data.sessionId, sceneData);
       }
     } catch (err) {
       logger.error("Failed to persist remove object to DB", err);
@@ -176,10 +182,49 @@ export class SocketHandlers {
   }
 
   /**
+   * Handle session join event
+   * data: { sessionId: string, id: string, name: string }
+   */
+  private async handleJoinSession(data: {
+    sessionId: string;
+    id: string;
+    name: string;
+  }): Promise<void> {
+    logger.info(`User joining session`, {
+      userId: data.id,
+      sessionId: data.sessionId,
+    });
+    const { sessionId, id, name } = data;
+    if (!sessionId || !id || !name) {
+      logger.warn(`Invalid session join data received`, data);
+      return;
+    }
+
+    // Track session and user on socket for disconnect
+    this.socket.data.sessionId = sessionId;
+    this.socket.data.userId = id;
+
+    // Add user to session participants (per session)
+    await this.sessionService.addParticipant(sessionId, { id, name });
+    this.socket.join(sessionId);
+
+    // Emit updated participant list to all in session
+    const users = this.sessionService.getParticipants(sessionId);
+    this.io.to(sessionId).emit("session:user_joined", { users });
+  }
+
+  /**
    * Handle client disconnection
    */
   private handleDisconnect(): void {
     logger.info(`User disconnected`, { socketId: this.socket.id });
+    const sessionId = this.socket.data.sessionId;
+    const userId = this.socket.data.userId;
+    if (sessionId && userId) {
+      this.sessionService.removeParticipant(sessionId, userId);
+      const users = this.sessionService.getParticipants(sessionId);
+      this.io.to(sessionId).emit("session:user_left", { userId, users });
+    }
     this.cleanup();
   }
 

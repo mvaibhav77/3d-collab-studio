@@ -34,7 +34,7 @@ export interface SessionSlice {
 
   // Session State Setters (for external updates like API responses, socket events)
   setSessionState: (session: CollaborativeSession) => void;
-  addSessionUser: (user: SessionUser) => void;
+  setSessionUsers: (users: SessionUser[]) => void;
   removeSessionUser: (userId: string) => void;
   updateSessionUser: (userId: string, updates: Partial<SessionUser>) => void;
   setConnectionStatus: (status: ConnectionStatus) => void;
@@ -131,21 +131,8 @@ export const createSessionSlice: StateCreator<
     });
   },
 
-  addSessionUser: (user: SessionUser) => {
-    set((state) => {
-      const existingIndex = state.sessionUsers.findIndex(
-        (u) => u.id === user.id
-      );
-      const updatedUsers = [...state.sessionUsers];
-
-      if (existingIndex >= 0) {
-        updatedUsers[existingIndex] = user;
-      } else {
-        updatedUsers.push(user);
-      }
-
-      return { sessionUsers: updatedUsers };
-    });
+  setSessionUsers: (users: SessionUser[]) => {
+    set({ sessionUsers: users });
   },
 
   removeSessionUser: (userId: string) => {

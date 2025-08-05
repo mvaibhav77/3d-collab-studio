@@ -1,3 +1,4 @@
+import { DatabaseService } from "./database/DatabaseService.js";
 import { ApiServer } from "./server/ApiServer.js";
 import dotenv from "dotenv";
 
@@ -5,5 +6,12 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // Start the server
-const server = new ApiServer();
-server.start();
+try {
+  const db = new DatabaseService();
+  await db.connect();
+
+  const server = new ApiServer(db);
+  server.start();
+} catch (error) {
+  console.error("Error starting server:", error);
+}

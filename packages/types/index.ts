@@ -28,8 +28,6 @@ export type TransformMode = "translate" | "rotate" | "scale";
 export interface SessionUser {
   id: string;
   name: string;
-  color: string; // User's cursor/selection color
-  isOnline: boolean;
 }
 
 export interface CollaborativeSession {
@@ -40,9 +38,6 @@ export interface CollaborativeSession {
 
   // Scene data stored as JSON
   sceneData: Record<string, any>;
-
-  // Active participants
-  participants: SessionUser[];
 }
 
 export type ConnectionStatus =
@@ -67,8 +62,8 @@ export interface ServerToClientEvents {
 
   // New session events
   "session:state": (data: CollaborativeSession) => void;
-  "session:user_joined": (data: { user: SessionUser }) => void;
-  "session:user_left": (data: { userId: string }) => void;
+  "session:user_joined": (data: { users: SessionUser[] }) => void;
+  "session:user_left": (data: { userId: string; users: SessionUser[] }) => void;
   "session:user_cursor_update": (data: {
     userId: string;
     cursor: { x: number; y: number; z: number };
@@ -94,10 +89,10 @@ export interface ClientToServerEvents {
   // New session events
   "session:join": (data: {
     sessionId: string;
-    userId: string;
-    userName: string;
+    id: string;
+    name: string;
   }) => void;
-  "session:leave": (data: { sessionId: string; userId: string }) => void;
+  // "session:leave": () => void;
   "session:cursor_update": (data: {
     sessionId: string;
     userId: string;
@@ -133,6 +128,7 @@ export interface CreateSessionRequest {
 export interface CreateSessionResponse {
   sessionId: string;
   session: CollaborativeSession;
+  owner: SessionUser;
 }
 
 export interface JoinSessionRequest {
@@ -143,6 +139,7 @@ export interface JoinSessionRequest {
 export interface JoinSessionResponse {
   session: CollaborativeSession;
   userId: string; // Assigned user ID for this session
+  participant: SessionUser;
 }
 
 export interface ApiError {

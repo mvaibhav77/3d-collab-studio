@@ -3,7 +3,7 @@
  * Layout for session pages with sidebar and canvas
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import ResizableSidebar from "../components/ResizableSidebar";
 import ToolbarFallback from "../components/ToolbarFallback";
@@ -16,7 +16,11 @@ const RemoteToolbar = React.lazy(() => import("mfe_toolbar/Toolbar"));
 const RemoteScene = React.lazy(() => import("mfe_canvas/Scene"));
 
 const SessionLayout: React.FC = () => {
-  logger.debug("SessionLayout rendered");
+
+  useEffect(() => {
+    logger.debug("SessionLayout rendered");
+    console.log("first render of SessionLayout");
+  }, []);
 
   return (
     <div className="flex flex-1 h-full overflow-hidden">
