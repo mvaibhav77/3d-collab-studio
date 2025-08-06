@@ -35,6 +35,7 @@ export interface CustomModel {
   name: string;
   appwriteId: string;
   id: string;
+  sessionId: string;
 }
 
 export interface CollaborativeSession {
@@ -80,7 +81,7 @@ export interface ServerToClientEvents {
     selectedObjectId: string | null;
   }) => void;
   "session:error": (data: { message: string }) => void;
-  "session:model_added": (data: { model: CustomModel }) => void;
+  "session:model_added": (data: CustomModel) => void;
 }
 
 export interface ClientToServerEvents {

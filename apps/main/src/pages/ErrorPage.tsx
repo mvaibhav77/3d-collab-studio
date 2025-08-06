@@ -6,7 +6,7 @@
 import React from "react";
 import { useRouteError, useNavigate } from "react-router-dom";
 import { logger } from "../lib/dev";
-import { config } from "../lib/config";
+import config from "../lib/config";
 
 interface RouteError {
   status?: number;

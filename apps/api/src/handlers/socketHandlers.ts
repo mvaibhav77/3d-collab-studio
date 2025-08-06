@@ -7,10 +7,9 @@ import type {
   TransformChangeData,
   SessionUser,
 } from "@repo/types";
-import { config } from "../config/index.js";
-import { logger } from "../utils/logger.js";
-import type { SessionService } from "../services/SessionService.js";
-import { v4 as uuid } from "uuid";
+import { config } from "../config/index";
+import { logger } from "../utils/logger";
+import type { SessionService } from "../services/SessionService";
 
 type SocketServer = Server<ClientToServerEvents, ServerToClientEvents>;
 type SocketClient = Socket<ClientToServerEvents, ServerToClientEvents>;
@@ -22,7 +21,7 @@ export class SocketHandlers {
   constructor(
     private io: SocketServer,
     private socket: SocketClient,
-    sessionService: SessionService,
+    sessionService: SessionService
   ) {
     this.sessionService = sessionService;
   }
@@ -35,7 +34,7 @@ export class SocketHandlers {
     this.socket.on("scene:add_object", this.handleAddObject.bind(this));
     this.socket.on(
       "object:transform_change",
-      this.handleTransformChange.bind(this),
+      this.handleTransformChange.bind(this)
     );
     this.socket.on("object:remove", this.handleRemoveObject.bind(this));
     this.socket.on("disconnect", this.handleDisconnect.bind(this));
@@ -46,7 +45,7 @@ export class SocketHandlers {
    * Handle color change events
    */
   private async handleColorChange(
-    data: ColorChangeData & { sessionId: string },
+    data: ColorChangeData & { sessionId: string }
   ): Promise<void> {
     // Validate color data
     if (!data.color || data.color.length < 3 || !data.sessionId) {
@@ -83,7 +82,7 @@ export class SocketHandlers {
    * Handle scene object addition
    */
   private async handleAddObject(
-    data: SceneObject & { sessionId: string },
+    data: SceneObject & { sessionId: string }
   ): Promise<void> {
     logger.info(`Adding object`, { id: data.id, type: data.type });
 
@@ -119,7 +118,7 @@ export class SocketHandlers {
    * Handle transform (position, rotation, scale) changes
    */
   private async handleTransformChange(
-    data: TransformChangeData & { sessionId: string },
+    data: TransformChangeData & { sessionId: string }
   ): Promise<void> {
     logger.debug(`Received transform change`, data);
 

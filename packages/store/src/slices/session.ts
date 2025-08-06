@@ -5,6 +5,7 @@ import type {
   CollaborativeSession,
   SessionHistoryItem,
   SessionHistory,
+  CustomModel,
 } from "@repo/types";
 import { sessionHistoryHelpers } from "../utils";
 
@@ -18,6 +19,10 @@ export interface SessionSlice {
   currentUserId: string | null;
   currentUserName: string | null;
   sceneData: Record<string, any> | null;
+
+  // Custom Models
+  customModels: CustomModel[];
+  addCustomModel: (model: CustomModel) => void;
 
   // Session History
   sessionHistory: SessionHistory;
@@ -58,6 +63,7 @@ export const createSessionSlice: StateCreator<
     createdSessions: [],
     joinedSessions: [],
   },
+  customModels: [],
 
   // Pure State Actions
   setCurrentUser: (user: SessionUser) => {
@@ -80,7 +86,7 @@ export const createSessionSlice: StateCreator<
         ...state.sessionHistory,
         createdSessions: sessionHistoryHelpers.addToBeginning(
           state.sessionHistory.createdSessions,
-          session,
+          session
         ),
       },
     }));
@@ -92,7 +98,7 @@ export const createSessionSlice: StateCreator<
         ...state.sessionHistory,
         joinedSessions: sessionHistoryHelpers.addToBeginning(
           state.sessionHistory.joinedSessions,
-          session,
+          session
         ),
       },
     }));
@@ -103,11 +109,11 @@ export const createSessionSlice: StateCreator<
       sessionHistory: {
         createdSessions: sessionHistoryHelpers.updateLastVisited(
           state.sessionHistory.createdSessions,
-          sessionId,
+          sessionId
         ),
         joinedSessions: sessionHistoryHelpers.updateLastVisited(
           state.sessionHistory.joinedSessions,
-          sessionId,
+          sessionId
         ),
       },
     }));
@@ -122,12 +128,23 @@ export const createSessionSlice: StateCreator<
     });
   },
 
+  // Custom Model Actions
+  addCustomModel: (model: CustomModel) => {
+    set((state) => ({
+      // Add the new model only if it doesn't already exist
+      customModels: state.customModels.some((m) => m.id === model.id)
+        ? state.customModels
+        : [...state.customModels, model],
+    }));
+  },
+
   // Session State Setters (for external updates)
   setSessionState: (session: CollaborativeSession) => {
     set({
       sessionId: session.id,
       sessionName: session.name,
       sceneData: session.sceneData,
+      customModels: (session as any).customModels || [],
     });
   },
 
@@ -144,7 +161,7 @@ export const createSessionSlice: StateCreator<
   updateSessionUser: (userId: string, updates: Partial<SessionUser>) => {
     set((state) => ({
       sessionUsers: state.sessionUsers.map((user) =>
-        user.id === userId ? { ...user, ...updates } : user,
+        user.id === userId ? { ...user, ...updates } : user
       ),
     }));
   },

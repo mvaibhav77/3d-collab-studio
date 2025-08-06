@@ -3,11 +3,11 @@ import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import type { ServerToClientEvents, ClientToServerEvents } from "@repo/types";
-import { config } from "../config/index.js";
-import { logger } from "../utils/logger.js";
-import { SocketHandlers } from "../handlers/socketHandlers.js";
-import { SessionService } from "../services/SessionService.js";
-import { DatabaseService } from "../database/DatabaseService.js";
+import { config } from "../config/index";
+import { logger } from "../utils/logger";
+import { SocketHandlers } from "../handlers/socketHandlers";
+import { SessionService } from "../services/SessionService";
+import { DatabaseService } from "../database/DatabaseService";
 
 export class ApiServer {
   private app: express.Application;
@@ -23,7 +23,7 @@ export class ApiServer {
       this.server,
       {
         cors: config.socket.cors,
-      },
+      }
     );
     this.setupSocketHandlers();
 
@@ -121,7 +121,7 @@ export class ApiServer {
       }
     });
 
-     this.app.post("/api/sessions/:id/models", async (req, res) => {
+    this.app.post("/api/sessions/:id/models", async (req, res) => {
       try {
         const sessionId = req.params.id;
         const { name, appwriteId } = req.body;
@@ -133,12 +133,12 @@ export class ApiServer {
         const newModel = await this.db.createCustomModel(
           name,
           appwriteId,
-          sessionId,
+          sessionId
         );
 
         // After saving, broadcast to all clients in the session
-        this.io.to(sessionId).emit("session:model_added", {model: newModel});
-        
+        this.io.to(sessionId).emit("session:model_added", newModel);
+
         res.status(201).json(newModel);
       } catch (error) {
         logger.error("Error creating custom model", { error });
@@ -171,8 +171,6 @@ export class ApiServer {
     // Graceful shutdown handling
     this.setupGracefulShutdown();
   }
-
-  
 
   /**
    * Setup graceful shutdown handlers

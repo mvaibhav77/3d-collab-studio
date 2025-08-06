@@ -3,7 +3,7 @@
  * Only included in development builds
  */
 
-import { config } from "./config";
+import config from "./config";
 
 // Development logger with levels
 class DevLogger {
@@ -100,7 +100,7 @@ class DevPerformance {
 // Development error boundary helper
 export function logError(
   error: Error,
-  errorInfo?: { componentStack?: string },
+  errorInfo?: { componentStack?: string }
 ): void {
   logger.error("React Error:", {
     message: error.message,

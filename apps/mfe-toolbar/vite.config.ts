@@ -17,7 +17,13 @@ export default defineConfig({
       exposes: {
         "./Toolbar": "./src/Toolbar.tsx",
       },
-      shared: ["react", "react-dom", "@repo/store", "@repo/types", "@repo/api-client", "@tailwindcss/vite"],
+      shared: [
+        "react",
+        "react-dom",
+        "@repo/store",
+        "@repo/types",
+        "@repo/api-client",
+      ],
     }),
   ],
   build: {

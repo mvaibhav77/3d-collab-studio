@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import type { CollaborativeSession } from "@repo/types";
+import type { CollaborativeSession, CustomModel } from "@repo/types";
 
 export class DatabaseService {
   private prisma: PrismaClient;
@@ -88,7 +88,7 @@ export class DatabaseService {
     name: string,
     appwriteId: string,
     sessionId: string
-  ): Promise<{ id: string; name: string; appwriteId: string }> {
+  ): Promise<CustomModel> {
     const model = await this.prisma.customModel.create({
       data: {
         name,
@@ -97,10 +97,6 @@ export class DatabaseService {
       },
     });
 
-    return {
-      id: model.id,
-      name: model.name,
-      appwriteId: model.appwriteId,
-    };
+    return model;
   }
 }
