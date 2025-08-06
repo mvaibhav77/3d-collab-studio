@@ -58,12 +58,12 @@ const JoinSessionPage: React.FC = () => {
 
   const sessionsPerPage = 5;
   const totalPages = Math.ceil(
-    sessionHistory.joinedSessions.length / sessionsPerPage
+    sessionHistory.joinedSessions.length / sessionsPerPage,
   );
   const startIndex = (currentPage - 1) * sessionsPerPage;
   const currentSessions = sessionHistory.joinedSessions.slice(
     startIndex,
-    startIndex + sessionsPerPage
+    startIndex + sessionsPerPage,
   );
 
   // Set session ID from URL if provided
@@ -72,7 +72,7 @@ const JoinSessionPage: React.FC = () => {
       setSessionInput(urlSessionId);
       logger.info(
         "JoinSessionPage: Pre-filled session ID from URL",
-        urlSessionId
+        urlSessionId,
       );
     }
   }, [urlSessionId]);
@@ -102,7 +102,7 @@ const JoinSessionPage: React.FC = () => {
       // Update store with new session history
       const historyItem = sessionHistoryHelpers.createHistoryItem(
         sessionId,
-        response.session.name
+        response.session.name,
       );
 
       // Set current user

@@ -29,7 +29,7 @@ const Torus = forwardRef<Mesh, TorusProps>(
         />
       </mesh>
     );
-  }
+  },
 );
 
 Torus.displayName = "Torus";

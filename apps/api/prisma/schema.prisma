@@ -13,9 +13,22 @@ model Session {
   name      String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  
+
   // Scene data stored as JSON - contains all objects and state
-  sceneData Json     @default("{}") @map("scene_data")
-  
+  sceneData    Json          @default("{}") @map("scene_data")
+  customModels CustomModel[]
+
   @@map("sessions")
+}
+
+model CustomModel {
+  id         String @id @default(uuid())
+  name       String // The user-given name for the model
+  appwriteId String @unique // The unique file ID from Appwrite Storage
+  sessionId  String // The session this model belongs to
+
+  // Define the relationship back to the Session
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("custom_models")
 }

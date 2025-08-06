@@ -84,7 +84,7 @@ export default function FreeRoamControls({
       // Constrain phi to prevent camera flipping
       spherical.current.phi = Math.max(
         0.1,
-        Math.min(Math.PI - 0.1, spherical.current.phi)
+        Math.min(Math.PI - 0.1, spherical.current.phi),
       );
 
       lastMouse.current = { x: event.clientX, y: event.clientY };
@@ -97,7 +97,7 @@ export default function FreeRoamControls({
       spherical.current.radius += event.deltaY * zoomSpeed * 0.01;
       spherical.current.radius = Math.max(
         1,
-        Math.min(100, spherical.current.radius)
+        Math.min(100, spherical.current.radius),
       );
     };
 

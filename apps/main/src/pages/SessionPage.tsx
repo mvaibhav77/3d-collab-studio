@@ -25,11 +25,11 @@ const SessionPage: React.FC = () => {
   // Memoize session IDs for stable dependencies
   const createdSessionIds = useMemo(
     () => sessionHistory.createdSessions.map((s) => s.id).join(","),
-    [sessionHistory.createdSessions]
+    [sessionHistory.createdSessions],
   );
   const joinedSessionIds = useMemo(
     () => sessionHistory.joinedSessions.map((s) => s.id).join(","),
-    [sessionHistory.joinedSessions]
+    [sessionHistory.joinedSessions],
   );
 
   const loadSession = useCallback(
@@ -59,7 +59,7 @@ const SessionPage: React.FC = () => {
         navigate(ROUTES.JOIN_SESSION(sessionId), { replace: true });
       }
     },
-    [setConnectionStatus, setSessionState, updateSessionLastVisited, navigate]
+    [setConnectionStatus, setSessionState, updateSessionLastVisited, navigate],
   );
 
   useEffect(() => {
@@ -77,7 +77,7 @@ const SessionPage: React.FC = () => {
     if (!hasAccess) {
       logger.info(
         "SessionPage: User has no access to session, redirecting to join page",
-        sessionId
+        sessionId,
       );
       navigate(ROUTES.JOIN_SESSION(sessionId), { replace: true });
       return;

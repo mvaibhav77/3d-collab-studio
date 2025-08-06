@@ -10,9 +10,11 @@
     "preview": "vite preview --port 5001 --strictPort"
   },
   "dependencies": {
+    "@repo/api-client": "workspace:^",
     "@repo/store": "workspace:^",
     "@repo/types": "workspace:^",
     "@tailwindcss/vite": "^4.1.11",
+    "appwrite": "^18.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "socket.io-client": "^4.8.1",

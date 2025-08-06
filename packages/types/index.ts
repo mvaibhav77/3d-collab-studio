@@ -30,6 +30,13 @@ export interface SessionUser {
   name: string;
 }
 
+// Model Type
+export interface CustomModel {
+  name: string;
+  appwriteId: string;
+  id: string;
+}
+
 export interface CollaborativeSession {
   id: string;
   name: string;
@@ -73,6 +80,7 @@ export interface ServerToClientEvents {
     selectedObjectId: string | null;
   }) => void;
   "session:error": (data: { message: string }) => void;
+  "session:model_added": (data: { model: CustomModel }) => void;
 }
 
 export interface ClientToServerEvents {

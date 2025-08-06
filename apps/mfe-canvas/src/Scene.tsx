@@ -35,7 +35,7 @@ export default function Scene() {
   useEffect(() => {
     if (sceneData) {
       setObjects(
-        sceneData as { [id: string]: import("@repo/types").SceneObject }
+        sceneData as { [id: string]: import("@repo/types").SceneObject },
       );
     }
   }, [sceneData, setObjects]);

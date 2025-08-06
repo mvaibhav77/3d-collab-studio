@@ -1,5 +1,7 @@
 import type { StateCreator } from "zustand";
 import type { SceneObject } from "@repo/types";
+import { produce } from "immer";
+import type { GlobalState } from "../store";
 
 // Scene State Slice
 export interface SceneSlice {
@@ -13,37 +15,39 @@ export interface SceneSlice {
   removeObject: (id: string) => void;
 }
 
-export const createSceneSlice: StateCreator<SceneSlice, [], [], SceneSlice> = (
-  set
+export const createSceneSlice: StateCreator<GlobalState, [], [], SceneSlice> = (
+  set,
+  get,
 ) => ({
   // State
   objects: {},
-
-  // Actions
   setObjects: (objects) => set({ objects }),
-
   addObject: (object) =>
-    set((state) => ({
-      objects: {
-        ...state.objects,
-        [object.id]: object,
-      },
-    })),
-
+    set(
+      produce((state) => {
+        state.objects[object.id] = object;
+      }),
+    ),
   updateObject: (id, partialObject) =>
-    set((state) => ({
-      objects: {
-        ...state.objects,
-        [id]: state.objects[id]
-          ? { ...state.objects[id], ...partialObject }
-          : state.objects[id],
-      },
-    })),
+    set(
+      produce((state) => {
+        if (state.objects[id]) {
+          Object.assign(state.objects[id], partialObject);
+        }
+      }),
+    ),
 
+  // Corrected removeObject implementation
   removeObject: (id) =>
-    set((state) => {
-      const newObjects = { ...state.objects };
-      delete newObjects[id];
-      return { objects: newObjects };
-    }),
+    set(
+      produce((state) => {
+        // First, check if the object being removed is the currently selected one.
+        // We also need to import `selectedObjectId` into this slice's type
+        // and have the combined store handle it. For now, we assume it's available.
+        if (get().selectedObjectId === id) {
+          state.selectedObjectId = null; // De-select the object
+        }
+        delete state.objects[id]; // Then, remove it from the scene
+      }),
+    ),
 });

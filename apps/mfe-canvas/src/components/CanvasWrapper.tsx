@@ -7,7 +7,7 @@ export default function DragDropCanvas({
   children: React.ReactNode;
   onObjectDrop: (
     objectType: string,
-    worldPosition: [number, number, number]
+    worldPosition: [number, number, number],
   ) => void;
 }) {
   const canvasRef = useRef<HTMLDivElement>(null);

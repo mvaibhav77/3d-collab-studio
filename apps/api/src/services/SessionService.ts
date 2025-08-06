@@ -47,7 +47,7 @@ export class SessionService {
 
   // Create a new session
   async createSession(
-    request: CreateSessionRequest
+    request: CreateSessionRequest,
   ): Promise<CreateSessionResponse> {
     try {
       logger.info(`Creating new session: ${request.name}`);
@@ -118,7 +118,7 @@ export class SessionService {
   // Update session scene data
   async updateSession(
     sessionId: string,
-    sceneData: Record<string, any>
+    sceneData: Record<string, any>,
   ): Promise<void> {
     try {
       await this.db.updateSession(sessionId, sceneData);

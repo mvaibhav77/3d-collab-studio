@@ -47,7 +47,7 @@ export default defineConfig(({ mode }) => {
       __DEV__: JSON.stringify(isDev),
       __PROD__: JSON.stringify(isProduction),
       __APP_VERSION__: JSON.stringify(
-        process.env.npm_package_version || "1.0.0"
+        process.env.npm_package_version || "1.0.0",
       ),
     },
 
@@ -75,6 +75,7 @@ export default defineConfig(({ mode }) => {
           "@react-three/fiber",
           "@react-three/drei",
           "@repo/store",
+          "@repo/api-client",
         ],
       }),
     ],

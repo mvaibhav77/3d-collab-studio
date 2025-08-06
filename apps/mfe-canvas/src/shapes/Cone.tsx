@@ -29,7 +29,7 @@ const Cone = forwardRef<Mesh, ConeProps>(
         />
       </mesh>
     );
-  }
+  },
 );
 
 Cone.displayName = "Cone";

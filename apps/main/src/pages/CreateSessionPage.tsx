@@ -49,12 +49,12 @@ const CreateSessionPage: React.FC = () => {
 
   const sessionsPerPage = 5;
   const totalPages = Math.ceil(
-    sessionHistory.createdSessions.length / sessionsPerPage
+    sessionHistory.createdSessions.length / sessionsPerPage,
   );
   const startIndex = (currentPage - 1) * sessionsPerPage;
   const currentSessions = sessionHistory.createdSessions.slice(
     startIndex,
-    startIndex + sessionsPerPage
+    startIndex + sessionsPerPage,
   );
 
   const handleCreateSession = async () => {
@@ -80,7 +80,7 @@ const CreateSessionPage: React.FC = () => {
       // Update store with new session history
       const historyItem = sessionHistoryHelpers.createHistoryItem(
         response.sessionId,
-        sessionName
+        sessionName,
       );
 
       // Add to created sessions in store

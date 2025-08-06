@@ -100,7 +100,7 @@ class DevPerformance {
 // Development error boundary helper
 export function logError(
   error: Error,
-  errorInfo?: { componentStack?: string }
+  errorInfo?: { componentStack?: string },
 ): void {
   logger.error("React Error:", {
     message: error.message,

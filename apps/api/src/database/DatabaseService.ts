@@ -82,4 +82,25 @@ export class DatabaseService {
       return false;
     }
   }
-};
+
+  // Create a new model entry
+  async createCustomModel(
+    name: string,
+    appwriteId: string,
+    sessionId: string
+  ): Promise<{ id: string; name: string; appwriteId: string }> {
+    const model = await this.prisma.customModel.create({
+      data: {
+        name,
+        appwriteId,
+        sessionId,
+      },
+    });
+
+    return {
+      id: model.id,
+      name: model.name,
+      appwriteId: model.appwriteId,
+    };
+  }
+}

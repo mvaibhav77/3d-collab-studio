@@ -29,7 +29,7 @@ const Sphere = forwardRef<Mesh, SphereProps>(
         />
       </mesh>
     );
-  }
+  },
 );
 
 Sphere.displayName = "Sphere";

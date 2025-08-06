@@ -80,7 +80,7 @@ export const createSessionSlice: StateCreator<
         ...state.sessionHistory,
         createdSessions: sessionHistoryHelpers.addToBeginning(
           state.sessionHistory.createdSessions,
-          session
+          session,
         ),
       },
     }));
@@ -92,7 +92,7 @@ export const createSessionSlice: StateCreator<
         ...state.sessionHistory,
         joinedSessions: sessionHistoryHelpers.addToBeginning(
           state.sessionHistory.joinedSessions,
-          session
+          session,
         ),
       },
     }));
@@ -103,11 +103,11 @@ export const createSessionSlice: StateCreator<
       sessionHistory: {
         createdSessions: sessionHistoryHelpers.updateLastVisited(
           state.sessionHistory.createdSessions,
-          sessionId
+          sessionId,
         ),
         joinedSessions: sessionHistoryHelpers.updateLastVisited(
           state.sessionHistory.joinedSessions,
-          sessionId
+          sessionId,
         ),
       },
     }));
@@ -144,7 +144,7 @@ export const createSessionSlice: StateCreator<
   updateSessionUser: (userId: string, updates: Partial<SessionUser>) => {
     set((state) => ({
       sessionUsers: state.sessionUsers.map((user) =>
-        user.id === userId ? { ...user, ...updates } : user
+        user.id === userId ? { ...user, ...updates } : user,
       ),
     }));
   },

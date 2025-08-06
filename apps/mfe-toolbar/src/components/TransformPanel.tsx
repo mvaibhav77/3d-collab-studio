@@ -1,9 +1,11 @@
 import { useGlobalStore } from "@repo/store";
 import { socket } from "../socket";
 import { MoveIcon, RotateIcon, ScaleIcon } from "../assets/svgs";
+import Trash2Icon from "../assets/svgs/Trash2Icon";
 
 const TransformPanel = () => {
   const {
+    sessionId,
     selectedObjectId,
     objects,
     updateObject,
@@ -31,6 +33,12 @@ const TransformPanel = () => {
       icon: <ScaleIcon />,
     },
   ];
+
+  const handleDeleteObject = () => {
+    if (selectedObjectId && sessionId) {
+      socket.emit("object:remove", { id: selectedObjectId, sessionId });
+    }
+  };
 
   return (
     <div className="flex flex-col space-y-6 p-1">
@@ -130,6 +138,17 @@ const TransformPanel = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Opiton */}
+      <div className="pt-4 border-t border-slate-200">
+        <button
+          onClick={handleDeleteObject}
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium text-sm bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25 transition-all duration-200 ease-out active:scale-[0.98]"
+        >
+          <Trash2Icon /> {/* Add a trash icon for better UI */}
+          Delete Object
+        </button>
+      </div>
     </div>
   );
 };

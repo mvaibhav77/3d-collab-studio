@@ -97,7 +97,7 @@ export const urlUtils = {
 
 // Hook for creating navigation helper
 export function createNavigationHelper(
-  navigate: NavigateFunction
+  navigate: NavigateFunction,
 ): NavigationHelper {
   return new NavigationHelper(navigate);
 }

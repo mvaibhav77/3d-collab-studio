@@ -49,10 +49,10 @@ if (import.meta.env.DEV) {
 }
 
 // Create and export the configuration object
-export const config: AppConfig = {
+const config: AppConfig = {
   // API Configuration
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL || "http://localhost:3001",
-  websocketUrl: import.meta.env.VITE_WEBSOCKET_URL || "ws://localhost:3001/ws",
+  websocketUrl: import.meta.env.VITE_WEBSOCKET_URL || "http://localhost:3001",
 
   // Micro-Frontend URLs
   mfeToolbarUrl:

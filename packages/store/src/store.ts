@@ -28,8 +28,8 @@ export const useGlobalStore = create<GlobalState>()(
         currentUserName: state.currentUserName,
         currentUserId: state.currentUserId,
       }),
-    }
-  )
+    },
+  ),
 );
 
 // Export individual slice types for convenience

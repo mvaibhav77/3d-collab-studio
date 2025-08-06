@@ -44,7 +44,7 @@ const ObjectPanel = () => {
 
   const handleDragStart = (
     event: React.DragEvent<HTMLDivElement>,
-    shapeType: string
+    shapeType: string,
   ) => {
     event.dataTransfer.setData("text/plain", shapeType);
   };

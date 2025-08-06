@@ -8,5 +8,5 @@ createRoot(document.getElementById("root")!).render(
     <div className="canvs-container h-screen w-screen">
       <Scene />
     </div>
-  </div>
+  </div>,
 );

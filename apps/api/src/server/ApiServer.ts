@@ -23,7 +23,7 @@ export class ApiServer {
       this.server,
       {
         cors: config.socket.cors,
-      }
+      },
     );
     this.setupSocketHandlers();
 
@@ -120,6 +120,31 @@ export class ApiServer {
         res.status(500).json({ error: "Failed to update session" });
       }
     });
+
+     this.app.post("/api/sessions/:id/models", async (req, res) => {
+      try {
+        const sessionId = req.params.id;
+        const { name, appwriteId } = req.body;
+
+        if (!name || !appwriteId) {
+          return res.status(400).json({ error: "Missing name or appwriteId" });
+        }
+
+        const newModel = await this.db.createCustomModel(
+          name,
+          appwriteId,
+          sessionId,
+        );
+
+        // After saving, broadcast to all clients in the session
+        this.io.to(sessionId).emit("session:model_added", {model: newModel});
+        
+        res.status(201).json(newModel);
+      } catch (error) {
+        logger.error("Error creating custom model", { error });
+        res.status(500).json({ error: "Failed to create custom model" });
+      }
+    });
   }
 
   /**
@@ -146,6 +171,8 @@ export class ApiServer {
     // Graceful shutdown handling
     this.setupGracefulShutdown();
   }
+
+  
 
   /**
    * Setup graceful shutdown handlers

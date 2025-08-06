@@ -25,7 +25,7 @@ export const useObjectCreation = ({ addObject }: UseObjectCreationProps) => {
         socket.emit("scene:add_object", { ...newObject, sessionId });
       }
     },
-    [addObject, sessionId]
+    [addObject, sessionId],
   );
   return { handleObjectDrop };
 };

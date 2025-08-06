@@ -20,6 +20,7 @@
   "dependencies": {
     "@react-three/drei": "^10.6.1",
     "@react-three/fiber": "^9.3.0",
+    "@repo/api-client": "workspace:^",
     "@repo/store": "workspace:^",
     "@repo/three-wrapper": "workspace:^",
     "@repo/types": "workspace:^",

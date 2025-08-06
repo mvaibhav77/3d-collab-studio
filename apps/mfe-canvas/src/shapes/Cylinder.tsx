@@ -29,7 +29,7 @@ const Cylinder = forwardRef<Mesh, CylinderProps>(
         />
       </mesh>
     );
-  }
+  },
 );
 
 Cylinder.displayName = "Cylinder";
