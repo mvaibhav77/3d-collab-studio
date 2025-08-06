@@ -13,6 +13,7 @@ import { useGlobalStore, sessionHistoryHelpers } from "@repo/store";
 import { apiClient } from "../lib/api";
 import { ROUTES } from "../router/index";
 import type { SessionHistoryItem } from "@repo/types";
+import { logger } from "../lib/dev";
 
 // Utility function for formatting dates
 const formatLastVisited = (lastVisited: Date): string => {
@@ -68,15 +69,27 @@ const CreateSessionPage: React.FC = () => {
         userName: userName,
       });
 
+      const user = {
+        id: "temp_" + Date.now(),
+        name: userName.trim(),
+      };
+
+      // Set current user
+      setCurrentUser(user);
+
       // Update store with new session history
       const historyItem = sessionHistoryHelpers.createHistoryItem(
         response.sessionId,
         sessionName
       );
-      addToCreatedSessions(historyItem);
 
-      // Set current user
-      setCurrentUser("temp_" + Date.now(), userName);
+      // Add to created sessions in store
+      addToCreatedSessions({
+        ...historyItem,
+        user,
+      });
+
+      logger.info("CreateSessionPage: Successfully created session", response);
 
       // Navigate to session
       navigate(ROUTES.SESSION(response.sessionId));

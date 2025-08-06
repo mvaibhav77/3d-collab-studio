@@ -9,21 +9,14 @@ import type {
 } from "@repo/types";
 import type { DatabaseService } from "../database/DatabaseService.js";
 import { logger } from "../utils/logger.js";
-import { Server } from "socket.io";
-import type { ServerToClientEvents, ClientToServerEvents } from "@repo/types";
 
 export class SessionService {
   // Track participants per session
   private sessionParticipants: Record<string, SessionUser[]> = {};
   private db: DatabaseService;
-  private io: Server<ClientToServerEvents, ServerToClientEvents>;
 
-  constructor(
-    db: DatabaseService,
-    io: Server<ClientToServerEvents, ServerToClientEvents>
-  ) {
+  constructor(db: DatabaseService) {
     this.db = db;
-    this.io = io;
   }
 
   /**
@@ -68,8 +61,6 @@ export class SessionService {
         name: request.userName,
       };
 
-      this.addParticipant(session.id, owner);
-
       return {
         sessionId: session.id,
         session,
@@ -97,9 +88,6 @@ export class SessionService {
         id: userId,
         name: request.userName,
       };
-
-      // Add participant to the session's participants list
-      this.addParticipant(request.sessionId, participant);
 
       logger.info(`User joining session`, {
         sessionId: request.sessionId,

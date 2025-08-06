@@ -28,7 +28,7 @@ export class ApiServer {
     this.setupSocketHandlers();
 
     this.db = db;
-    this.sessionService = new SessionService(this.db, this.io);
+    this.sessionService = new SessionService(this.db);
 
     this.setupMiddleware();
     this.setupApiRoutes();

@@ -3,12 +3,13 @@
  * Main collaborative session interface
  */
 
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGlobalStore } from "@repo/store";
 import { apiClient } from "../lib/api";
 import { ROUTES } from "../router/index";
 import { logger } from "../lib/dev";
+import type { SessionUser } from "@repo/types";
 
 const SessionPage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -18,6 +19,7 @@ const SessionPage: React.FC = () => {
     setSessionState,
     setConnectionStatus,
     updateSessionLastVisited,
+    setCurrentUser,
   } = useGlobalStore();
 
   // Memoize session IDs for stable dependencies
@@ -30,28 +32,8 @@ const SessionPage: React.FC = () => {
     [sessionHistory.joinedSessions]
   );
 
-  useEffect(() => {
-    if (!sessionId) {
-      logger.warn("SessionPage: No sessionId provided, redirecting to home");
-      navigate("/", { replace: true });
-      return;
-    }
-
-    // Check if user has access to this session (is in created or joined sessions)
-    const hasAccess =
-      createdSessionIds.split(",").includes(sessionId) ||
-      joinedSessionIds.split(",").includes(sessionId);
-
-    if (!hasAccess) {
-      logger.info(
-        "SessionPage: User has no access to session, redirecting to join page",
-        sessionId
-      );
-      navigate(ROUTES.JOIN_SESSION(sessionId), { replace: true });
-      return;
-    }
-
-    const loadSession = async () => {
+  const loadSession = useCallback(
+    async (sessionId: string) => {
       try {
         logger.info("SessionPage: Loading session", sessionId);
         setConnectionStatus("connecting");
@@ -76,9 +58,39 @@ const SessionPage: React.FC = () => {
         // On error, redirect to join page instead of home
         navigate(ROUTES.JOIN_SESSION(sessionId), { replace: true });
       }
-    };
+    },
+    [setConnectionStatus, setSessionState, updateSessionLastVisited, navigate]
+  );
 
-    loadSession();
+  useEffect(() => {
+    if (!sessionId) {
+      logger.warn("SessionPage: No sessionId provided, redirecting to home");
+      navigate("/", { replace: true });
+      return;
+    }
+
+    // Check if user has access to this session (is in created or joined sessions)
+    const hasAccess =
+      createdSessionIds.split(",").includes(sessionId) ||
+      joinedSessionIds.split(",").includes(sessionId);
+
+    if (!hasAccess) {
+      logger.info(
+        "SessionPage: User has no access to session, redirecting to join page",
+        sessionId
+      );
+      navigate(ROUTES.JOIN_SESSION(sessionId), { replace: true });
+      return;
+    }
+
+    const currentSession =
+      sessionHistory.createdSessions.find((s) => s.id === sessionId) ||
+      sessionHistory.joinedSessions.find((s) => s.id === sessionId);
+
+    setCurrentUser(currentSession?.user as SessionUser);
+
+    loadSession(sessionId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     sessionId,
     navigate,
@@ -87,6 +99,7 @@ const SessionPage: React.FC = () => {
     setSessionState,
     setConnectionStatus,
     updateSessionLastVisited,
+    loadSession,
   ]);
 
   if (!sessionId) {

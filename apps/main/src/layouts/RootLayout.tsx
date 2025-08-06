@@ -10,7 +10,6 @@ import { logger } from "../lib/dev";
 
 const RootLayout: React.FC = () => {
   logger.debug("RootLayout rendered");
-
   return (
     <div className="flex flex-col h-screen bg-surface-100 overflow-hidden">
       {/* Global Header */}

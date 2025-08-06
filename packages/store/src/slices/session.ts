@@ -23,7 +23,7 @@ export interface SessionSlice {
   sessionHistory: SessionHistory;
 
   // Pure State Actions (no API calls)
-  setCurrentUser: (userId: string, userName: string) => void;
+  setCurrentUser: (user: SessionUser) => void;
   leaveSession: () => void;
 
   // Session History Actions
@@ -60,8 +60,8 @@ export const createSessionSlice: StateCreator<
   },
 
   // Pure State Actions
-  setCurrentUser: (userId: string, userName: string) => {
-    set({ currentUserId: userId, currentUserName: userName });
+  setCurrentUser: (user: SessionUser) => {
+    set({ currentUserId: user.id, currentUserName: user.name });
   },
 
   leaveSession: () => {

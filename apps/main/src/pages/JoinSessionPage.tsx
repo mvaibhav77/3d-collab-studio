@@ -94,15 +94,25 @@ const JoinSessionPage: React.FC = () => {
         userName: userName.trim(),
       });
 
+      const user = {
+        id: "temp_" + Date.now(),
+        name: userName.trim(),
+      };
+
       // Update store with new session history
       const historyItem = sessionHistoryHelpers.createHistoryItem(
         sessionId,
         response.session.name
       );
-      addToJoinedSessions(historyItem);
 
       // Set current user
-      setCurrentUser(response.userId || "temp_" + Date.now(), userName.trim());
+      setCurrentUser(user);
+
+      // Add to joined sessions in store with user info
+      addToJoinedSessions({
+        ...historyItem,
+        user,
+      });
 
       logger.info("JoinSessionPage: Successfully joined session", response);
 

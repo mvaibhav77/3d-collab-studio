@@ -10,6 +10,7 @@ import type {
 import { config } from "../config/index.js";
 import { logger } from "../utils/logger.js";
 import type { SessionService } from "../services/SessionService.js";
+import { v4 as uuid } from "uuid";
 
 type SocketServer = Server<ClientToServerEvents, ServerToClientEvents>;
 type SocketClient = Socket<ClientToServerEvents, ServerToClientEvents>;
@@ -185,16 +186,18 @@ export class SocketHandlers {
    * Handle session join event
    * data: { sessionId: string, id: string, name: string }
    */
-  private async handleJoinSession(data: {
+  private handleJoinSession(data: {
     sessionId: string;
     id: string;
     name: string;
-  }): Promise<void> {
-    logger.info(`User joining session`, {
-      userId: data.id,
-      sessionId: data.sessionId,
-    });
+  }) {
     const { sessionId, id, name } = data;
+
+    logger.info(`User joining session`, {
+      userName: name,
+      sessionId: sessionId,
+    });
+
     if (!sessionId || !id || !name) {
       logger.warn(`Invalid session join data received`, data);
       return;
@@ -203,10 +206,10 @@ export class SocketHandlers {
     // Track session and user on socket for disconnect
     this.socket.data.sessionId = sessionId;
     this.socket.data.userId = id;
-
-    // Add user to session participants (per session)
-    await this.sessionService.addParticipant(sessionId, { id, name });
     this.socket.join(sessionId);
+
+    // Add user to session participants (per session), prevent duplicates
+    this.sessionService.addParticipant(sessionId, { id, name });
 
     // Emit updated participant list to all in session
     const users = this.sessionService.getParticipants(sessionId);

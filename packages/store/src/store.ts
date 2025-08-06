@@ -26,6 +26,7 @@ export const useGlobalStore = create<GlobalState>()(
         // Persist only session history and basic user info
         sessionHistory: state.sessionHistory,
         currentUserName: state.currentUserName,
+        currentUserId: state.currentUserId,
       }),
     }
   )

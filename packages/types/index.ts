@@ -112,6 +112,7 @@ export interface SessionHistoryItem {
   name: string;
   lastVisited: Date;
   url: string;
+  user?: SessionUser;
 }
 
 export interface SessionHistory {
