@@ -11,6 +11,8 @@
     "preview": "vite preview --port 5001 --strictPort"
   },
   "dependencies": {
+    "@react-three/drei": "^10.6.1",
+    "@react-three/fiber": "^9.3.0",
     "@repo/api-client": "workspace:^",
     "@repo/store": "workspace:^",
     "@repo/types": "workspace:^",

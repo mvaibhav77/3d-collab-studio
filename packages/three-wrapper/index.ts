@@ -1,2 +1,30 @@
-export * from "three";
+// Only export what is actually used in the app to reduce bundle size
+export {
+  Scene,
+  PerspectiveCamera,
+  OrthographicCamera,
+  WebGLRenderer,
+  Mesh,
+  MeshStandardMaterial,
+  MeshBasicMaterial,
+  MeshPhongMaterial,
+  BoxGeometry,
+  SphereGeometry,
+  CylinderGeometry,
+  TorusGeometry,
+  ConeGeometry,
+  Color,
+  Vector3,
+  Group,
+  Object3D,
+  AmbientLight,
+  DirectionalLight,
+  PointLight,
+  Fog,
+  TextureLoader,
+  Euler,
+  Quaternion,
+  Raycaster,
+  MathUtils,
+} from "three";
 export { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
