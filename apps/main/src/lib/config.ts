@@ -76,13 +76,7 @@ const config: AppConfig = {
 
 // Development-only logging
 if (config.isDevelopment) {
-  console.log("🔧 App Configuration:", {
-    mode: import.meta.env.MODE,
-    apiBaseUrl: config.apiBaseUrl,
-    websocketUrl: config.websocketUrl,
-    enableDevTools: config.enableDevTools,
-    logLevel: config.logLevel,
-  });
+  // Removed console.log for production cleanup
 }
 
 // Export individual values for convenience

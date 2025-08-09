@@ -59,15 +59,15 @@ export function useSessionPresence() {
         users = [...users, { id: currentUserId, name: currentUserName }];
       }
       setSessionUsers(users);
-      console.log("[session:user_joined] received", users);
+      // Removed console.log for production cleanup
     };
     const onUserLeft = (data: { userId: string; users: SessionUser[] }) => {
       setSessionUsers(data.users);
-      console.log("[session:user_left] received", data.users);
+      // Removed console.log for production cleanup
     };
     const onSessionState = (session: CollaborativeSession) => {
       setSessionState(session);
-      console.log("[session:state] received", session);
+      // Removed console.log for production cleanup
     };
     socket.on("session:user_joined", onUserJoined);
     socket.on("session:user_left", onUserLeft);

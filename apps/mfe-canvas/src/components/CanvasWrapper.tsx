@@ -26,7 +26,7 @@ export default function DragDropCanvas({
     event.preventDefault();
     setIsDragOver(false);
     const data = event.dataTransfer.getData("text/plain");
-    console.log("WHAT HAPPENED", data);
+    // Removed console.log for production cleanup
     if (data && canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect();
       const x = event.clientX - rect.left;
