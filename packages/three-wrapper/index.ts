@@ -25,6 +25,7 @@ export {
   Euler,
   Quaternion,
   Raycaster,
+  Spherical,
   MathUtils,
 } from "three";
 export { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
