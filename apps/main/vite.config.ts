@@ -1,4 +1,5 @@
 import { defineConfig, loadEnv } from "vite";
+import { vercelPreset } from "@vercel/react-router/vite";
 import react from "@vitejs/plugin-react-swc";
 import federation from "@originjs/vite-plugin-federation";
 import tailwindcss from "@tailwindcss/vite";
@@ -20,6 +21,8 @@ export default defineConfig(({ mode }) => {
         port: 3003,
       },
     },
+
+    presets: [vercelPreset()],
 
     // Preview server configuration
     preview: {
