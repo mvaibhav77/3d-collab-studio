@@ -1,16 +1,19 @@
+import React from "react"; // Import React for RefObject
 import Sphere from "../shapes/Sphere";
 import Cylinder from "../shapes/Cylinder";
 import Cone from "../shapes/Cone";
 import Torus from "../shapes/Torus";
-import type { SceneObject, ShapeType } from "@repo/types";
-import type { Mesh } from "@repo/three-wrapper";
+import type { SceneObject } from "@repo/types";
+import type { Mesh, Group } from "@repo/three-wrapper"; // Import Group for the ref
 import Cube from "../shapes/Cube";
+import CustomModel from "../shapes/CustomModel";
 
 interface SceneObjectsProps {
   objects: Record<string, SceneObject>;
   selectedObjectId: string | null;
   setSelectedObjectId: (id: string | null) => void;
-  objectRefs: React.RefObject<{ [id: string]: Mesh }>;
+  // FIX 1: Broaden the ref type to accept either a Mesh or a Group
+  objectRefs: React.RefObject<{ [id: string]: Mesh | Group }>;
 }
 
 const ShapeComponents = {
@@ -19,6 +22,7 @@ const ShapeComponents = {
   cylinder: Cylinder,
   cone: Cone,
   torus: Torus,
+  customModel: CustomModel,
 } as const;
 
 export default function SceneObjects({
@@ -27,35 +31,58 @@ export default function SceneObjects({
   setSelectedObjectId,
   objectRefs,
 }: SceneObjectsProps) {
-  const renderShape = (id: string, obj: SceneObject) => {
-    const ShapeComponent = ShapeComponents[obj.type as ShapeType];
+  const renderShape = (id: string, obj: SceneObject): React.ReactNode => {
+    const ShapeComponent =
+      ShapeComponents[obj.type as keyof typeof ShapeComponents];
 
     if (!ShapeComponent) {
       console.warn(`Unknown shape type: ${obj.type}`);
       return null;
     }
 
+    // Base props shared by all components
     const commonProps = {
       key: id,
-      ref: (mesh: Mesh | null) => {
-        if (mesh) {
-          objectRefs.current[id] = mesh;
-        } else {
-          delete objectRefs.current[id];
-        }
-      },
       position: obj.position,
       scale: obj.scale,
       rotation: obj.rotation,
-      color: obj.color,
       isSelected: selectedObjectId === id,
       onSelect: () => {
-        console.log("Selected object:", obj);
         setSelectedObjectId(selectedObjectId === id ? null : obj.id);
       },
     };
 
-    return <ShapeComponent {...commonProps} />;
+    if (obj.type === "customModel" && obj.model) {
+      // CustomModel expects id (string) and model
+      return (
+        <CustomModel
+          {...commonProps}
+          id={id}
+          model={obj.model}
+          ref={(el: Group | null) => {
+            if (el) objectRefs.current[id] = el;
+            else delete objectRefs.current[id];
+          }}
+        />
+      );
+    } else if (obj.type !== "customModel") {
+      // Primitive shapes expect color and Mesh ref
+      return (
+        <ShapeComponent
+          id={""}
+          model={{
+            appwriteId: "",
+          }}
+          {...commonProps}
+          color={obj.color}
+          ref={(el: Mesh | Group | null) => {
+            if (el) objectRefs.current[id] = el;
+            else delete objectRefs.current[id];
+          }}
+        />
+      );
+    }
+    return null;
   };
 
   return (

@@ -7,21 +7,20 @@ export const sessionHistoryHelpers = {
       id: sessionId,
       name,
       lastVisited: new Date(),
-      customModels: [],
       url: `/session/${sessionId}`,
     };
   },
 
   removeDuplicates(
     sessions: SessionHistoryItem[],
-    newSession: SessionHistoryItem,
+    newSession: SessionHistoryItem
   ): SessionHistoryItem[] {
     return sessions.filter((s) => s.id !== newSession.id);
   },
 
   addToBeginning(
     sessions: SessionHistoryItem[],
-    newSession: SessionHistoryItem,
+    newSession: SessionHistoryItem
   ): SessionHistoryItem[] {
     const filtered = this.removeDuplicates(sessions, newSession);
     return [newSession, ...filtered];
@@ -29,12 +28,12 @@ export const sessionHistoryHelpers = {
 
   updateLastVisited(
     sessions: SessionHistoryItem[],
-    sessionId: string,
+    sessionId: string
   ): SessionHistoryItem[] {
     return sessions.map((session) =>
       session.id === sessionId
         ? { ...session, lastVisited: new Date() }
-        : session,
+        : session
     );
   },
 };

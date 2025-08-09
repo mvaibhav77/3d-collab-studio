@@ -10,7 +10,11 @@ const CustomModelPanelContent = () => {
     event: React.DragEvent<HTMLDivElement>,
     model: CustomModel
   ) => {
-    event.dataTransfer.setData("application/json", JSON.stringify(model));
+    const dragData = {
+      type: "customModel",
+      model,
+    };
+    event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
   };
 
   return (

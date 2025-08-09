@@ -23,6 +23,8 @@ export default defineConfig({
         "@repo/store",
         "@repo/types",
         "@repo/api-client",
+        "appwrite",
+
       ],
     }),
   ],

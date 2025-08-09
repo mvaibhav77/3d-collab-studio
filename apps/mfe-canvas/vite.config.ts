@@ -24,6 +24,7 @@ export default defineConfig({
         "@react-three/fiber",
         "@react-three/drei",
         "@repo/store",
+        "appwrite",
       ],
     }),
   ],

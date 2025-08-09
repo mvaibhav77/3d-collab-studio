@@ -92,21 +92,14 @@ export class SocketHandlers {
     }
 
     // Broadcast to all clients including sender
-    this.io.emit("scene:add_object", data);
+    this.socket.broadcast.emit("scene:add_object", data);
 
     // Persist to DB
     try {
       const session = await this.sessionService.getSession(data.sessionId);
       if (session) {
         const sceneData = { ...session.sceneData };
-        sceneData[data.id] = {
-          id: data.id,
-          type: data.type,
-          position: data.position,
-          rotation: data.rotation,
-          scale: data.scale,
-          color: data.color,
-        };
+        sceneData[data.id] = data;
         await this.sessionService.updateSession(data.sessionId, sceneData);
       }
     } catch (err) {

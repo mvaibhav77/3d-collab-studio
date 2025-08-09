@@ -7,7 +7,7 @@ export default function DragDropCanvas({
   children: React.ReactNode;
   onObjectDrop: (
     objectType: string,
-    worldPosition: [number, number, number],
+    worldPosition: [number, number, number]
   ) => void;
 }) {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -25,9 +25,9 @@ export default function DragDropCanvas({
   const handleDrop = (event: React.DragEvent) => {
     event.preventDefault();
     setIsDragOver(false);
-    const objectType = event.dataTransfer.getData("text/plain");
-
-    if (objectType && canvasRef.current) {
+    const data = event.dataTransfer.getData("text/plain");
+    console.log("WHAT HAPPENED", data);
+    if (data && canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
@@ -45,7 +45,7 @@ export default function DragDropCanvas({
         ndcY * scaleFactor,
       ];
 
-      onObjectDrop(objectType, worldPosition);
+      onObjectDrop(data, worldPosition);
     }
   };
 

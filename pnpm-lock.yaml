@@ -185,6 +185,9 @@ importers:
       appwrite:
         specifier: ^18.2.0
         version: 18.2.0
+      idb:
+        specifier: ^8.0.3
+        version: 8.0.3
       nanoid:
         specifier: ^5.1.5
         version: 5.1.5
@@ -3480,6 +3483,10 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       safer-buffer: 2.1.2
+    dev: false
+
+  /idb@8.0.3:
+    resolution: {integrity: sha512-LtwtVyVYO5BqRvcsKuB2iUMnHwPVByPCXFXOpuU96IZPPoPN6xjOGxZQ74pgSVVLQWtUOYgyeL4GE98BY5D3wg==}
     dev: false
 
   /ieee754@1.2.1:

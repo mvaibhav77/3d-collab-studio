@@ -34,8 +34,9 @@ export default function Scene() {
   // Hydrate canvas state from sceneData on mount or when sceneData changes
   useEffect(() => {
     if (sceneData) {
+      console.log(sceneData);
       setObjects(
-        sceneData as { [id: string]: import("@repo/types").SceneObject },
+        sceneData as { [id: string]: import("@repo/types").SceneObject }
       );
     }
   }, [sceneData, setObjects]);
