@@ -13,10 +13,10 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 overfolw-y-auto">
       <div className="max-w-4xl mx-auto p-6">
         {/* Header */}
-        <div className="text-center py-16">
+        <div className="text-center py-12">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
             3D Collaboration Studio
           </h1>
