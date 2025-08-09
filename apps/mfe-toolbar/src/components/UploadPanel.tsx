@@ -12,7 +12,7 @@ const UploadPanel = () => {
   const [status, setStatus] = useState<
     "idle" | "uploading" | "success" | "error"
   >("idle");
-  const sessionId = useGlobalStore((state) => state.sessionId);
+  const { sessionId, addCustomModel } = useGlobalStore();
 
   const [error, setError] = useState<string | null>(null);
 
@@ -40,12 +40,14 @@ const UploadPanel = () => {
       }
 
       console.log(BUCKET_ID, ID.unique(), file);
+      // main upload to Appwrite Storage
       const response = await storage.createFile(BUCKET_ID, ID.unique(), file);
 
-      await apiClient.add3dModel(sessionId, modelName, response.$id);
-
+      // Save model details to the database
+      const model = await apiClient.add3dModel(sessionId, modelName, response.$id);
+      
+      addCustomModel(model);
       setStatus("success");
-      // Reset form after success
       setFile(null);
       setModelName("");
     } catch (e) {

@@ -1,27 +1,15 @@
-import React, { useEffect } from 'react';
-import { useGlobalStore } from '@repo/store';
-import { socket } from '../socket';
-import type { CustomModel } from '@repo/types';
+import React, { Suspense } from "react";
+import { useGlobalStore } from "@repo/store";
+import type { CustomModel } from "@repo/types";
+import CustomModelFallback from "./CustomModelsFallback";
 
-const CustomModelPanel = () => {
-  const { customModels, addCustomModel } = useGlobalStore();
+const CustomModelPanelContent = () => {
+  const { customModels } = useGlobalStore();
 
-  // Set up the socket listener
-  useEffect(() => {
-    const onModelAdded = (model: CustomModel) => {
-      addCustomModel(model);
-    };
-
-    socket.on('session:model_added', onModelAdded);
-
-    return () => {
-      socket.off('session:model_added', onModelAdded);
-    };
-  }, [addCustomModel]);
-
-  const handleDragStart = (event: React.DragEvent<HTMLDivElement>, model: CustomModel) => {
-    // When dragging, we'll pass the whole model object as a string
-    // The canvas will then parse this to get the appwriteId
+  const handleDragStart = (
+    event: React.DragEvent<HTMLDivElement>,
+    model: CustomModel
+  ) => {
     event.dataTransfer.setData("application/json", JSON.stringify(model));
   };
 
@@ -31,7 +19,9 @@ const CustomModelPanel = () => {
         Uploaded Models
       </h3>
       {customModels.length === 0 ? (
-        <p className="text-slate-500 text-xs text-center p-4">No models uploaded for this session yet.</p>
+        <p className="text-slate-500 text-xs text-center p-4">
+          No models uploaded for this session yet.
+        </p>
       ) : (
         <div className="grid grid-cols-2 gap-3">
           {customModels.map((model) => (
@@ -42,7 +32,9 @@ const CustomModelPanel = () => {
               className="group p-3 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg cursor-grab text-center shadow-sm"
             >
               <div className="text-2xl mb-1">📦</div>
-              <div className="text-slate-700 text-xs font-medium truncate">{model.name}</div>
+              <div className="text-slate-700 text-xs font-medium truncate">
+                {model.name}
+              </div>
             </div>
           ))}
         </div>
@@ -50,5 +42,11 @@ const CustomModelPanel = () => {
     </div>
   );
 };
+
+const CustomModelPanel = () => (
+  <Suspense fallback={<CustomModelFallback />}>
+    <CustomModelPanelContent />
+  </Suspense>
+);
 
 export default CustomModelPanel;

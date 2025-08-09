@@ -182,6 +182,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.11
         version: 4.1.11(vite@7.0.6)
+      appwrite:
+        specifier: ^18.2.0
+        version: 18.2.0
       nanoid:
         specifier: ^5.1.5
         version: 5.1.5

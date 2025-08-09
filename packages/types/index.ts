@@ -43,6 +43,7 @@ export interface CollaborativeSession {
   name: string;
   createdAt: Date;
   updatedAt: Date;
+  customModels: CustomModel[];
 
   // Scene data stored as JSON
   sceneData: Record<string, any>;
@@ -121,6 +122,7 @@ export interface SessionHistoryItem {
   name: string;
   lastVisited: Date;
   url: string;
+  customModels: CustomModel[];
   user?: SessionUser;
 }
 

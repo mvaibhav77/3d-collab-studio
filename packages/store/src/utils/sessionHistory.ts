@@ -7,6 +7,7 @@ export const sessionHistoryHelpers = {
       id: sessionId,
       name,
       lastVisited: new Date(),
+      customModels: [],
       url: `/session/${sessionId}`,
     };
   },

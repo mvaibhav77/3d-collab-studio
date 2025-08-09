@@ -4,6 +4,7 @@ import type {
   JoinSessionRequest,
   JoinSessionResponse,
   CollaborativeSession,
+  CustomModel,
 } from "@repo/types";
 
 // HTTP client wrapper
@@ -90,11 +91,17 @@ class ApiClient {
     sessionId: string,
     modelName: string,
     appwriteId: string
-  ): Promise<void> {
-    return this.request<void>(`/api/sessions/${sessionId}/models`, {
+  ): Promise<CustomModel> {
+    return this.request<CustomModel>(`/api/sessions/${sessionId}/models`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: modelName, appwriteId }),
+    });
+  }
+
+  async remove3dModel(sessionId: string, modelId: string): Promise<void> {
+    return this.request<void>(`/api/sessions/${sessionId}/models/${modelId}`, {
+      method: "DELETE",
     });
   }
 }

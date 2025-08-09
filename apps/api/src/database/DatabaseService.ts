@@ -36,6 +36,7 @@ export class DatabaseService {
       name: session.name,
       createdAt: session.createdAt,
       updatedAt: session.updatedAt,
+      customModels: [], 
       sceneData: session.sceneData as Record<string, any>,
     };
   }
@@ -44,6 +45,7 @@ export class DatabaseService {
   async getSession(sessionId: string): Promise<CollaborativeSession | null> {
     const session = await this.prisma.session.findUnique({
       where: { id: sessionId },
+      include: { customModels: true },
     });
 
     if (!session) return null;
@@ -53,6 +55,7 @@ export class DatabaseService {
       name: session.name,
       createdAt: session.createdAt,
       updatedAt: session.updatedAt,
+      customModels: session.customModels as CustomModel[],
       sceneData: session.sceneData as Record<string, any>,
     };
   }

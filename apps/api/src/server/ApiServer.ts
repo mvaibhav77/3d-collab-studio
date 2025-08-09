@@ -136,9 +136,6 @@ export class ApiServer {
           sessionId
         );
 
-        // After saving, broadcast to all clients in the session
-        this.io.to(sessionId).emit("session:model_added", newModel);
-
         res.status(201).json(newModel);
       } catch (error) {
         logger.error("Error creating custom model", { error });
