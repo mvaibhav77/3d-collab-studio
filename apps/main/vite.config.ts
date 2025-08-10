@@ -11,8 +11,31 @@ export default defineConfig(({ mode }) => {
   const isDev = mode === "development";
   const isProduction = mode === "production";
 
+  let mfeToolbarUrl =
+    env.VITE_MFE_TOOLBAR_URL || "http://localhost:5001/assets/remoteEntry.js";
+  let mfeCanvasUrl =
+    env.VITE_MFE_CANVAS_URL || "http://localhost:5002/assets/remoteEntry.js";
+
+  if (isProduction) {
+    if (!env.VITE_MFE_TOOLBAR_URL) {
+      throw new Error(
+        "Missing VITE_MFE_TOOLBAR_URL environment variable for production build."
+      );
+    }
+    mfeToolbarUrl = env.VITE_MFE_TOOLBAR_URL;
+
+    if (!env.VITE_MFE_CANVAS_URL) {
+      throw new Error(
+        "Missing VITE_MFE_CANVAS_URL environment variable for production build."
+      );
+    }
+    mfeCanvasUrl = env.VITE_MFE_CANVAS_URL;
+  }
+
   return {
     // Development server configuration
+    appType: "spa",
+
     server: {
       port: 3000,
       host: true,
@@ -35,14 +58,17 @@ export default defineConfig(({ mode }) => {
       outDir: "dist",
       sourcemap: !isProduction,
       minify: isProduction ? "esbuild" : false,
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            vendor: ["react", "react-dom"],
-            three: ["@react-three/fiber", "@react-three/drei"],
-          },
-        },
-      },
+      modulePreload: false,
+      target: "esnext",
+      cssCodeSplit: false,
+      // rollupOptions: {
+      //   output: {
+      //     manualChunks: {
+      //       vendor: ["react", "react-dom"],
+      //       three: ["@react-three/fiber", "@react-three/drei"],
+      //     },
+      //   },
+      // },
     },
 
     // Define global constants
@@ -63,12 +89,8 @@ export default defineConfig(({ mode }) => {
       federation({
         name: "main_host",
         remotes: {
-          mfe_toolbar:
-            env.VITE_MFE_TOOLBAR_URL ||
-            "http://localhost:5001/assets/remoteEntry.js",
-          mfe_canvas:
-            env.VITE_MFE_CANVAS_URL ||
-            "http://localhost:5002/assets/remoteEntry.js",
+          mfe_toolbar: mfeToolbarUrl,
+          mfe_canvas: mfeCanvasUrl,
         },
         shared: [
           "react",

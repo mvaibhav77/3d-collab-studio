@@ -33,14 +33,14 @@ export default defineConfig(({ mode }) => {
       outDir: "dist",
       sourcemap: !isProduction,
       minify: isProduction ? "esbuild" : false,
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            vendor: ["react", "react-dom"],
-            three: ["@react-three/fiber", "@react-three/drei"],
-          },
-        },
-      },
+      // rollupOptions: {
+      //   output: {
+      //     manualChunks: {
+      //       vendor: ["react", "react-dom"],
+      //       three: ["@react-three/fiber", "@react-three/drei"],
+      //     },
+      //   },
+      // },
     },
   };
 });
